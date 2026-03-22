@@ -8,7 +8,9 @@ Supports both PostgreSQL (production) and SQLite (local dev / CI).
 """
 
 import logging
+import os
 from collections.abc import Iterator
+from pathlib import Path
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
@@ -29,6 +31,14 @@ def _get_db_url() -> str:
         url = url.strip().strip('"').strip("'")
     if not url:
         return "sqlite:///./skystriker.db"
+
+    # Bare file path on a Railway volume (e.g. /datzza/skystriker.db)
+    if url.startswith("/") and url.endswith(".db"):
+        db_path = Path(url)
+        db_path.parent.mkdir(parents=True, exist_ok=True)
+        # sqlite:////absolute/path  (4 slashes = 3 for scheme + 1 for abs path)
+        return f"sqlite:///{url}"
+
     # Normalise any PostgreSQL URL to use the psycopg driver
     if url.startswith("postgres://"):
         return url.replace("postgres://", "postgresql+psycopg://", 1)
