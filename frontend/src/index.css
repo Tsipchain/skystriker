@@ -2,22 +2,54 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --sky-50: #f0f9ff;
+  --sky-100: #e0f2fe;
+  --sky-500: #0ea5e9;
+  --sky-600: #0284c7;
+  --sky-700: #0369a1;
+  --gold-400: #facc15;
+  --gold-500: #eab308;
+}
+
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   background-color: #f8fafc;
+  color: #0f172a;
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-sky-600 hover:bg-sky-700 text-white font-medium py-2 px-4 rounded-lg transition-colors;
+    @apply bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-5 rounded-lg transition-colors shadow-sm;
   }
   .btn-secondary {
     @apply bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg border border-gray-300 transition-colors;
   }
+  .btn-ghost {
+    @apply text-sky-600 hover:bg-sky-50 font-medium py-2 px-3 rounded-lg transition-colors;
+  }
   .card {
-    @apply bg-white rounded-xl shadow-sm border border-gray-100 p-6;
+    @apply bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden;
+  }
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  .badge-verified {
+    @apply badge bg-emerald-100 text-emerald-800;
+  }
+  .badge-pending {
+    @apply badge bg-amber-100 text-amber-800;
+  }
+  .badge-unverified {
+    @apply badge bg-gray-100 text-gray-600;
   }
   .input {
     @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent;
+  }
+  .section-title {
+    @apply text-2xl font-bold text-gray-900 mb-1;
+  }
+  .section-subtitle {
+    @apply text-gray-500 mb-6;
   }
 }

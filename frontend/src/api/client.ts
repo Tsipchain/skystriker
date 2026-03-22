@@ -1,29 +1,47 @@
-import axios from 'axios'
+/**
+ * Lightweight API client for the SkyStriker backend.
+ *
+ * Uses native fetch – no axios dependency required.
+ */
 
 const API_BASE = import.meta.env.VITE_API_URL || ''
 
-const api = axios.create({
-  baseURL: API_BASE,
-  headers: { 'Content-Type': 'application/json' },
-})
+interface RequestOptions {
+  method?: string
+  body?: unknown
+  headers?: Record<string, string>
+}
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('skystriker_token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
-})
+async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
+  const { method = 'GET', body, headers = {} } = opts
 
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('skystriker_token')
-      window.location.href = '/login'
-    }
-    return Promise.reject(error)
+  const guideId = localStorage.getItem('skystriker_guide_id') || ''
+  const adminToken = localStorage.getItem('skystriker_admin_token') || ''
+
+  const res = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(guideId ? { 'X-Guide-Id': guideId } : {}),
+      ...(adminToken ? { 'X-Admin-Token': adminToken } : {}),
+      ...headers,
+    },
+    ...(body ? { body: JSON.stringify(body) } : {}),
+  })
+
+  if (!res.ok) {
+    const detail = await res.json().catch(() => ({}))
+    throw new Error(detail.detail || `Request failed: ${res.status}`)
   }
-)
+
+  return res.json()
+}
+
+const api = {
+  get: <T>(path: string) => request<T>(path),
+  post: <T>(path: string, body?: unknown) => request<T>(path, { method: 'POST', body }),
+  patch: <T>(path: string, body?: unknown) => request<T>(path, { method: 'PATCH', body }),
+  delete: <T>(path: string) => request<T>(path, { method: 'DELETE' }),
+}
 
 export default api

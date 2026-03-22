@@ -1,112 +1,133 @@
-export interface Tour {
+/* ------------------------------------------------------------------ */
+/* Domain types for Thronos Chain SkyStriker Global Guides            */
+/* ------------------------------------------------------------------ */
+
+export interface Country {
   id: string
-  guide_id: string
-  title: string
-  description?: string
-  short_description?: string
-  category: string
-  languages: string[]
-  duration_hours: number
-  max_participants: number
-  min_participants: number
-  price_per_person: number
-  group_price?: number
-  currency: string
-  meeting_point?: string
-  meeting_point_lat?: number
-  meeting_point_lng?: number
-  city?: string
-  country: string
-  region?: string
-  route_points: RoutePoint[]
-  included_items: string[]
-  excluded_items: string[]
-  what_to_bring: string[]
-  difficulty_level: string
-  photos: string[]
-  tags: string[]
+  code: string
+  name: string
+  flag_emoji: string
   is_active: boolean
-  is_featured: boolean
-  total_bookings: number
-  avg_rating: number
-  created_at: string
 }
 
-export interface RoutePoint {
+export interface City {
+  id: string
+  country_id: string
   name: string
-  lat?: number
-  lng?: number
-  description?: string
+  slug: string
+  tagline: string
+  description: string
+  lat: number | null
+  lng: number | null
+  photo_url: string
+  is_active: boolean
+  country_name: string
+  country_code: string
+  guide_count: number
+  experience_count: number
+}
+
+export interface CityDetail extends City {
+  guides: GuideCard[]
+  experiences: ExperienceCard[]
+}
+
+export interface GuideCard {
+  id: string
+  full_name: string
+  bio: string
+  avatar_url: string
+  languages: string[]
+  specialties: string[]
+  city_name: string
+  country_name: string
+  verification_status: string
+  rating: number
+  total_reviews: number
+}
+
+export interface GuideDetail extends GuideCard {
+  email: string
+  phone: string
+  verifyid_reference: string
+  is_active: boolean
+  created_at: string | null
+  experiences: ExperienceCard[]
+}
+
+export interface ExperienceCard {
+  id: string
+  guide_id: string
+  city_id: string
+  title: string
+  slug: string
+  description: string
+  category: string
   duration_minutes: number
-  photos: string[]
+  price: number
+  currency: string
+  max_guests: number
+  languages: string[]
+  photo_url: string
+  is_active: boolean
+  avg_rating: number
+  total_bookings: number
+  guide_name: string
+  city_name: string
 }
 
 export interface Booking {
   id: string
-  tour_id: string
+  experience_id: string
   guide_id: string
-  customer_name: string
-  customer_email: string
-  customer_phone?: string
-  tour_date: string
-  tour_time?: string
-  participants_count: number
-  price_per_person: number
+  guest_name: string
+  guest_email: string
+  guest_phone: string
+  requested_date: string
+  requested_time: string
+  guests_count: number
   total_price: number
-  platform_commission: number
-  guide_payout: number
   currency: string
-  payment_status: string
   status: string
-  special_requests?: string
-  confirmation_code?: string
-  created_at: string
+  note: string
+  created_at: string | null
 }
 
 export interface Review {
   id: string
-  tour_id: string
+  experience_id: string
   guide_id: string
-  customer_name: string
+  booking_id: string | null
+  reviewer_name: string
   rating: number
-  title?: string
-  comment?: string
-  guide_response?: string
-  responded_at?: string
-  is_verified: boolean
-  created_at: string
+  comment: string
+  guide_response: string
+  is_published: boolean
+  is_flagged: boolean
+  created_at: string | null
 }
 
-export interface Guide {
+export interface AuditEntry {
   id: string
-  name: string
-  bio?: string
-  languages: string[]
-  specialties: string[]
-  verified: boolean
-  rating: number
-  total_tours: number
-  total_reviews: number
-  location_city?: string
-  location_country: string
-  hourly_rate: number
-  currency: string
-  profile_image_url?: string
+  action: string
+  actor: string
+  target_type: string
+  target_id: string
+  detail: string
+  created_at: string | null
 }
 
-export interface ChatMessage {
-  role: 'user' | 'assistant'
-  content: string
-  data?: any
-  suggested_actions?: { label: string; action: string; params: any }[]
+export interface PlatformStats {
+  countries: number
+  cities: number
+  guides: number
+  experiences: number
+  verified_guides: number
 }
 
-export interface DailyBriefing {
-  date: string
-  bookings_today: any[]
-  total_participants: number
-  revenue_today: number
-  pending_reviews: number
-  weather?: any
-  tips: string[]
+export interface HealthResponse {
+  status: string
+  service: string
+  version: string
+  environment: string
 }

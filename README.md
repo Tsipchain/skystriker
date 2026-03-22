@@ -1,124 +1,85 @@
-# SkyStriker - Tour Guide Platform
+# Thronos Chain SkyStriker Global Guides
 
-AI-powered platform connecting tourists with local tour guides. Part of the **Thronos Ecosystem**.
+Verified local guides & destination experiences. Part of the **Thronos Chain** ecosystem.
 
 ## Concept
 
-SkyStriker is a marketplace for tour guides. Guides create profiles, list their tours with routes, and manage bookings. Tourists discover tours, book, and pay - with transactions verified on the Thronos blockchain.
+SkyStriker connects travellers with verified local guides who offer authentic destination experiences. Guides create profiles, list experiences across cities and countries, and manage bookings — all backed by Thronos Chain verification.
 
-**Business Model:** 20% platform commission on all bookings.
+**Business Model:** 15 % platform commission on completed bookings.
 
-## For Tour Guides
+## For Guides
 
-- Create professional profile with certifications, languages, specialties
-- Build tours with detailed routes, points of interest, pricing
-- Manage bookings and schedule
-- AI Assistant for daily briefings, earnings tracking, review management
-- Weather-integrated tour planning
-- ether.fi card integration for instant payouts
-- Analytics dashboard (revenue, popular tours, ratings)
+- Create a professional profile with bio, languages, specialties
+- Submit for identity verification via Thronos VerifyID
+- List experiences with pricing, descriptions, and categories
+- Manage booking requests (confirm / decline)
+- View reviews and ratings from guests
 
-## For Tourists
+## For Travellers
 
-- Browse and search tours by city, category, language, price
-- View guide profiles, ratings, and verified reviews
-- Book tours with instant confirmation
-- Pay via card, crypto, or cash
-- Leave verified reviews after completion
-
-## Features
-
-### Tour Guide Side
-- Profile management with verification
-- Tour creation with route builder (POI mapping)
-- Booking management (confirm/cancel/complete)
-- Review responses
-- AI Assistant (Greek + English):
-  - "Τι κρατήσεις έχω αύριο;"
-  - "Πόσα έβγαλα αυτόν τον μήνα;"
-  - "Γράψε μια περιγραφή για food tour"
-  - "Τι καιρό θα κάνει στην Αθήνα;"
-- Revenue analytics and performance tracking
-- Daily briefing with schedule + weather + tips
-
-### Tourist Side (Public API)
-- Search tours by city, category, language, price range, difficulty
-- Browse verified guides
-- Featured tours discovery
-- Real-time availability checking
-- Booking with confirmation codes
-- Review system with verified bookings
-
-### Blockchain Integration
-- All transactions recorded on Thronos blockchain
-- Payment verification via blockchain tx hash
-- Guide identity verification through Thronos VerifyID
-
-### ether.fi Integration
-- Card issuance for guides (instant payouts)
-- Liquidity bridging through Thronos chain
-- Referral program: https://www.ether.fi/refer/74df90a0
+- Browse countries, cities, and experiences
+- Filter by category: food, history, nature, nightlife, adventure, culture, wellness, photography
+- View guide profiles with verification badges and ratings
+- Book experiences directly
+- Leave reviews after completion
 
 ## Tech Stack
 
-- **Backend**: Python / FastAPI (async)
-- **Database**: PostgreSQL with SQLAlchemy async ORM
-- **Frontend**: React + TypeScript + Vite + Tailwind CSS
-- **Auth**: JWT tokens
-- **AI**: OpenAI integration + custom NLP
-- **Weather**: OpenWeatherMap API
-- **Blockchain**: Thronos chain integration
-- **Payments**: Card, Crypto, ether.fi cards
-- **Deployment**: Railway / Vercel
+| Layer | Technology |
+|-------|-----------|
+| Backend | Python / FastAPI (async) |
+| Database | SQLite (dev) / PostgreSQL (prod) via SQLAlchemy async |
+| Frontend | React + TypeScript + Vite + Tailwind CSS |
+| Auth | Header-based demo auth (JWT planned) |
+| Verification | Thronos VerifyID integration |
+| Deployment | Railway via Nixpacks |
 
-## API Endpoints
+## API Overview
 
-### Public (No Auth)
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/api/v1/public/tours` | Search tours |
-| GET | `/api/v1/public/tours/{id}` | Tour details |
-| GET | `/api/v1/public/guides` | Browse guides |
-| GET | `/api/v1/public/guides/{id}` | Guide profile |
-| GET | `/api/v1/public/featured` | Featured tours |
-| GET | `/api/v1/public/cities` | Cities with tours |
-| POST | `/api/v1/bookings` | Create booking |
-| POST | `/api/v1/reviews` | Leave review |
+### Public (`/api/v1/public/`)
+- `GET /countries` — List countries with guide counts
+- `GET /cities` — List cities, optionally filter by country
+- `GET /cities/{slug}` — City detail with guides & experiences
+- `GET /guides` — Browse verified guides
+- `GET /guides/{id}` — Guide profile with experiences & reviews
+- `GET /experiences` — Search experiences by city, category, price
+- `GET /experiences/{id}` — Experience detail
 
-### Guide (Auth Required)
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/api/v1/auth/register` | Register as guide |
-| POST | `/api/v1/auth/login` | Login |
-| GET | `/api/v1/guides/me` | My profile |
-| PUT | `/api/v1/guides/me` | Update profile |
-| CRUD | `/api/v1/tours/*` | Tour management |
-| GET | `/api/v1/bookings` | My bookings |
-| PATCH | `/api/v1/bookings/{id}/confirm` | Confirm booking |
-| PATCH | `/api/v1/bookings/{id}/complete` | Complete booking |
-| GET | `/api/v1/reviews` | My reviews |
-| POST | `/api/v1/reviews/{id}/respond` | Respond to review |
-| GET | `/api/v1/analytics/*` | Revenue & stats |
-| POST | `/api/v1/assistant/chat` | AI Assistant |
-| GET | `/api/v1/assistant/daily-briefing` | Daily briefing |
+### Guide (`/api/v1/guide/`)
+- `GET /me` — Current guide profile
+- `PATCH /me` — Update profile
+- `POST /verification/submit` — Submit for verification
+- `CRUD /experiences` — Manage experiences
+- `GET /bookings` — List bookings
+- `POST /bookings/{id}/confirm|decline` — Handle booking requests
+- `GET /reviews` — View received reviews
+
+### Admin (`/api/v1/admin/`)
+- Guide management and verification approval
+- Experience moderation
+- Review moderation
+- Audit log
 
 ## Quick Start
 
 ```bash
+# Backend
 cd backend
 pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
+
+# Frontend
+cd frontend
+npm install
+npm run dev
 ```
 
-## Target Markets
-
-1. **Greece** (launch market) - Athens, Thessaloniki, Santorini, Mykonos, Crete, Rhodes
-2. **Mediterranean** - Turkey, Croatia, Italy, Spain, Portugal
-3. **Global** - Emerging tourism markets without established platforms
+Set `SEED_DEMO_DATA=true` (default) to populate demo countries, cities, guides, and experiences on first run.
 
 ## Part of Thronos Ecosystem
 
-- **thronos-V3.6** - Core blockchain platform
-- **thronos-verifyid** - KYC/Identity verification
-- **thronos-commerce-assistant** - E-shop AI assistant
-- **skystriker** - Tour guide platform (this)
+- **thronos-V3.6** — Core blockchain platform
+- **thronos-verifyid** — KYC / Identity verification
+- **thronos-commerce-assistant** — E-shop AI assistant
+- **skystriker** — Global guides platform (this)
