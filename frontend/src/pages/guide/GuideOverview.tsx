@@ -10,8 +10,8 @@ export default function GuideOverview() {
 
   useEffect(() => {
     api
-      .get("/api/v1/guide/me")
-      .then((res) => setGuide(res.data))
+      .get<GuideDetail>("/api/v1/guide/me")
+      .then((data) => setGuide(data))
       .catch(() => setError("Failed to load guide profile."))
       .finally(() => setLoading(false));
   }, []);
@@ -21,8 +21,8 @@ export default function GuideOverview() {
   if (!guide) return null;
 
   const stats = [
-    { label: "Bookings", value: guide.bookings_count ?? 0 },
-    { label: "Reviews", value: guide.reviews_count ?? 0 },
+    { label: "Experiences", value: guide.experiences?.length ?? 0 },
+    { label: "Reviews", value: guide.total_reviews ?? 0 },
     { label: "Rating", value: guide.rating ? guide.rating.toFixed(1) : "N/A" },
   ];
 

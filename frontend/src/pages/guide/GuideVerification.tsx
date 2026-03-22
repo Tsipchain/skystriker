@@ -12,8 +12,8 @@ export default function GuideVerification() {
 
   useEffect(() => {
     api
-      .get("/api/v1/guide/me")
-      .then((res) => setGuide(res.data))
+      .get<GuideDetail>("/api/v1/guide/me")
+      .then((data) => setGuide(data))
       .catch(() => setError("Failed to load verification status."))
       .finally(() => setLoading(false));
   }, []);

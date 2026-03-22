@@ -18,9 +18,8 @@ export default function GuideProfile() {
 
   useEffect(() => {
     api
-      .get("/api/v1/guide/me")
-      .then((res) => {
-        const g: GuideDetail = res.data;
+      .get<GuideDetail>("/api/v1/guide/me")
+      .then((g) => {
         setGuide(g);
         setFullName(g.full_name ?? "");
         setBio(g.bio ?? "");
