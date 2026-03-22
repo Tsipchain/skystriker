@@ -33,11 +33,14 @@ def _get_db_url() -> str:
         return "sqlite:///./skystriker.db"
 
     # Bare file path on a Railway volume (e.g. /datzza/skystriker.db)
-    if url.startswith("/") and url.endswith(".db"):
+    # Also catches paths without .db extension or with extra whitespace
+    if url.startswith("/") and "://" not in url:
         db_path = Path(url)
         db_path.parent.mkdir(parents=True, exist_ok=True)
         # sqlite:////absolute/path  (4 slashes = 3 for scheme + 1 for abs path)
-        return f"sqlite:///{url}"
+        result = f"sqlite:///{url}"
+        logger.info("Converted bare path %r → %s", url, result)
+        return result
 
     # Normalise any PostgreSQL URL to use the psycopg driver
     if url.startswith("postgres://"):
@@ -53,6 +56,7 @@ def initialize_database() -> None:
     global _engine, SessionLocal
 
     db_url = _get_db_url()
+    logger.info("Resolved DB URL: %s", db_url[:60] + "…" if len(db_url) > 60 else db_url)
     engine_kwargs: dict = {"echo": settings.debug, "future": True, "pool_pre_ping": True}
     if db_url.startswith("sqlite"):
         engine_kwargs["connect_args"] = {"check_same_thread": False}
