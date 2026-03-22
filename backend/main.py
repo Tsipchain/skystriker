@@ -1,111 +1,85 @@
-import importlib
+"""Thronos Chain SkyStriker Global Guides – FastAPI entry-point.
+
+Keeps startup logic minimal:
+1.  Initialise the async DB engine and run ``CREATE TABLE`` for SQLite.
+2.  Optionally seed demo data when ``SEED_DEMO_DATA=true``.
+3.  Mount the three router groups (public, guide, admin) plus health.
+"""
+
 import logging
 import os
-import pkgutil
 from contextlib import asynccontextmanager
-from datetime import datetime
 
 from fastapi import FastAPI
-from fastapi.routing import APIRouter
+from fastapi.staticfiles import StaticFiles
 
-from core.config import settings, validate_environment
+from core.config import settings
 from middleware.cors import setup_cors
-from services.database import initialize_database, close_database
+from services.database import close_database, initialize_database
+
+logger = logging.getLogger(__name__)
 
 
-def setup_logging():
-    if os.environ.get("IS_LAMBDA") == "true":
-        return
-    log_dir = "logs"
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    log_file = f"{log_dir}/app_{timestamp}.log"
-    logging.basicConfig(
-        level=logging.DEBUG if settings.debug else logging.INFO,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        handlers=[
-            logging.FileHandler(log_file, encoding="utf-8"),
-            logging.StreamHandler(),
-        ],
-    )
-    logger = logging.getLogger(__name__)
-    logger.info("=== SkyStriker Tour Guide Platform - Logging initialized ===")
-
+# ---------------------------------------------------------------------------
+# Lifespan
+# ---------------------------------------------------------------------------
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger = logging.getLogger(__name__)
-    logger.info("=== SkyStriker startup initiated ===")
-    validate_environment()
-    try:
-        await initialize_database()
-    except Exception as e:
-        logger.error(f"Startup failed: {e}")
-    logger.info("=== SkyStriker startup completed ===")
+    logging.basicConfig(
+        level=logging.DEBUG if settings.debug else logging.INFO,
+        format="%(asctime)s  %(name)-30s  %(levelname)-8s  %(message)s",
+    )
+    logger.info("=== SkyStriker Global Guides – startup ===")
+    await initialize_database()
+
+    if settings.seed_demo_data:
+        from services.seed import seed_if_empty
+        await seed_if_empty()
+
     yield
     await close_database()
+    logger.info("=== SkyStriker Global Guides – shutdown ===")
 
+
+# ---------------------------------------------------------------------------
+# Application
+# ---------------------------------------------------------------------------
 
 app = FastAPI(
-    title="SkyStriker - Tour Guide Platform API",
+    title="Thronos Chain SkyStriker Global Guides",
     description=(
-        "AI-powered platform connecting tourists with local tour guides. "
-        "Part of the Thronos Ecosystem. "
-        "Blockchain-verified transactions with 20% platform commission. "
-        "ether.fi card integration for guide payouts."
+        "Verified local guides & destination experiences. "
+        "Part of the Thronos Chain ecosystem."
     ),
-    version="1.0.0",
+    version="2.0.0",
     lifespan=lifespan,
 )
 
 setup_cors(app)
 
+# --- routers ---
+from routers.health import router as health_router  # noqa: E402
+from routers.public import router as public_router  # noqa: E402
+from routers.guide import router as guide_router  # noqa: E402
+from routers.admin import router as admin_router  # noqa: E402
 
-def include_routers_from_package(app: FastAPI, package_name: str = "routers") -> None:
-    logger = logging.getLogger(__name__)
-    try:
-        pkg = importlib.import_module(package_name)
-    except Exception as exc:
-        logger.debug("Routers package '%s' not loaded: %s", package_name, exc)
-        return
-    discovered = 0
-    for _finder, module_name, is_pkg in pkgutil.walk_packages(pkg.__path__, pkg.__name__ + "."):
-        if is_pkg:
-            continue
-        try:
-            module = importlib.import_module(module_name)
-        except Exception as exc:
-            logger.warning("Failed to import module '%s': %s", module_name, exc)
-            continue
-        for attr_name in ("router", "admin_router"):
-            if not hasattr(module, attr_name):
-                continue
-            attr = getattr(module, attr_name)
-            if isinstance(attr, APIRouter):
-                app.include_router(attr)
-                discovered += 1
-                logger.info("Included router: %s.%s", module_name, attr_name)
-    logger.info("Total routers discovered: %d", discovered)
-
-
-setup_logging()
-include_routers_from_package(app, "routers")
+app.include_router(health_router)
+app.include_router(public_router)
+app.include_router(guide_router)
+app.include_router(admin_router)
 
 
 @app.get("/")
 def root():
     return {
-        "service": "SkyStriker - Tour Guide Platform",
-        "version": "1.0.0",
-        "ecosystem": "Thronos",
-        "description": "Connect with local tour guides in Greece and beyond",
-        "commission": "20%",
-        "etherfi_referral": settings.etherfi_referral_url,
+        "service": "Thronos Chain SkyStriker Global Guides",
+        "version": "2.0.0",
         "docs": "/docs",
     }
 
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=int(settings.port))

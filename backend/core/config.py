@@ -1,47 +1,30 @@
+"""Application settings – loaded from environment / .env file."""
+
+import logging
 import os
+
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    app_name: str = "SkyStriker - Tour Guide Platform"
+    app_name: str = "Thronos Chain SkyStriker Global Guides"
     debug: bool = False
-    version: str = "1.0.0"
+    version: str = "2.0.0"
     environment: str = "development"
 
     host: str = "0.0.0.0"
     port: int = 8000
+    frontend_url: str = "http://localhost:5173"
 
     database_url: str | None = None
 
-    jwt_secret_key: str = "change-me-in-production"
-    jwt_algorithm: str = "HS256"
-    jwt_expiration_minutes: int = 1440
+    # Verification provider
+    verifyid_base_url: str = "https://verifyid.thronos.example/api"
+    verifyid_provider_label: str = "VerifyID"
 
-    openai_api_key: str = ""
-
-    # Thronos Blockchain
-    thronos_node_url: str = "https://node1.thronoschain.org"
-
-    # ether.fi integration for card issuance & liquidity
-    etherfi_referral_url: str = "https://www.ether.fi/refer/74df90a0"
-    etherfi_api_key: str = ""
-
-    # Platform commission
-    platform_commission_pct: float = 20.0  # 20% commission
-
-    # Email
-    email_enabled: bool = False
-    smtp_host: str = ""
-    smtp_port: int = 587
-    smtp_user: str = ""
-    smtp_password: str = ""
-    smtp_from_email: str = "noreply@skystriker.app"
-
-    # SMS
-    sms_api_key: str = ""
-
-    # Weather API
-    weather_api_key: str = ""
+    # Demo bootstrap
+    seed_demo_data: bool = True
+    default_country_code: str = "gr"
 
     cors_allow_origins: str = ""
 
@@ -49,18 +32,11 @@ class Settings(BaseSettings):
         env_file = ".env"
         extra = "ignore"
 
-    @property
-    def backend_url(self) -> str:
-        return f"http://{self.host}:{self.port}"
-
 
 settings = Settings()
 
 
 def validate_environment():
-    import logging
     logger = logging.getLogger(__name__)
     if not settings.database_url:
         logger.warning("DATABASE_URL not set – using in-memory SQLite")
-    if settings.jwt_secret_key == "change-me-in-production":
-        logger.warning("JWT_SECRET_KEY is using default – change in production")

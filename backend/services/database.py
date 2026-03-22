@@ -1,6 +1,11 @@
 import logging
+from collections.abc import AsyncIterator
+
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.pool import StaticPool
+
 from core.config import settings
+from models import __all__ as _registered_models  # noqa: F401
 from models.base import Base
 
 logger = logging.getLogger(__name__)
@@ -11,29 +16,45 @@ async_session: async_sessionmaker[AsyncSession] | None = None
 def _get_db_url() -> str:
     url = settings.database_url
     if not url:
-        return "sqlite+aiosqlite://"
+        return "sqlite+aiosqlite:///./skystriker.db"
     if url.startswith("postgres://"):
-        url = url.replace("postgres://", "postgresql+asyncpg://", 1)
-    elif url.startswith("postgresql://"):
-        url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        return url.replace("postgres://", "postgresql+psycopg://", 1)
+    if url.startswith("postgresql://") and "+" not in url:
+        return url.replace("postgresql://", "postgresql+psycopg://", 1)
     return url
 
 
-async def initialize_database():
+async def initialize_database() -> None:
     global _engine, async_session
+
     db_url = _get_db_url()
-    is_sqlite = db_url.startswith("sqlite")
-    _engine = create_async_engine(
-        db_url, echo=settings.debug,
-        **({"connect_args": {"check_same_thread": False}} if is_sqlite else {"pool_size": 10, "max_overflow": 20}),
-    )
-    async_session = async_sessionmaker(_engine, class_=AsyncSession, expire_on_commit=False)
+    engine_kwargs: dict = {"echo": settings.debug, "future": True, "pool_pre_ping": True}
+    if db_url.startswith("sqlite"):
+        engine_kwargs["connect_args"] = {"check_same_thread": False}
+        if ":memory:" in db_url:
+            engine_kwargs["poolclass"] = StaticPool
+    else:
+        engine_kwargs["pool_size"] = 5
+        engine_kwargs["max_overflow"] = 10
+
+    _engine = create_async_engine(db_url, **engine_kwargs)
+    async_session = async_sessionmaker(_engine, expire_on_commit=False, class_=AsyncSession)
+
     async with _engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    logger.info("Database initialized")
+
+    logger.info("Database initialized", extra={"database_url": db_url})
 
 
-async def close_database():
+async def close_database() -> None:
     global _engine
-    if _engine:
+    if _engine is not None:
         await _engine.dispose()
+        logger.info("Database connection disposed")
+
+
+async def get_session() -> AsyncIterator[AsyncSession]:
+    if async_session is None:
+        raise RuntimeError("Database session requested before initialization")
+    async with async_session() as session:
+        yield session

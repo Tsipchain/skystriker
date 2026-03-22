@@ -1,3 +1,5 @@
+"""Database session dependency for FastAPI routes."""
+
 from services.database import async_session
 
 
