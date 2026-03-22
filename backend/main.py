@@ -9,8 +9,10 @@ Keeps startup logic minimal:
 import logging
 import os
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from core.config import settings
@@ -70,13 +72,41 @@ app.include_router(guide_router)
 app.include_router(admin_router)
 
 
-@app.get("/")
-def root():
-    return {
-        "service": "Thronos Chain SkyStriker Global Guides",
-        "version": "2.0.0",
-        "docs": "/docs",
-    }
+# ---------------------------------------------------------------------------
+# Serve frontend SPA (built files copied to /app/frontend_dist at deploy)
+# ---------------------------------------------------------------------------
+
+_frontend_dir = Path("/app/frontend_dist")
+# Fallback: local dev with frontend/dist next to backend/
+if not _frontend_dir.exists():
+    _frontend_dir = Path(__file__).resolve().parent.parent / "frontend" / "dist"
+
+if _frontend_dir.exists():
+    # Serve /assets (JS, CSS, images) as static files
+    app.mount("/assets", StaticFiles(directory=_frontend_dir / "assets"), name="frontend-assets")
+
+    @app.get("/")
+    def serve_index():
+        return FileResponse(_frontend_dir / "index.html")
+
+    # SPA catch-all: any path not matched by API routes serves index.html
+    @app.get("/{full_path:path}")
+    def spa_fallback(full_path: str):
+        # Try to serve a static file first (favicon, manifest, etc.)
+        file_path = _frontend_dir / full_path
+        if file_path.is_file():
+            return FileResponse(file_path)
+        return FileResponse(_frontend_dir / "index.html")
+else:
+    logger.warning("Frontend dist not found at %s – serving API only", _frontend_dir)
+
+    @app.get("/")
+    def root():
+        return {
+            "service": "Thronos Chain SkyStriker Global Guides",
+            "version": "2.0.0",
+            "docs": "/docs",
+        }
 
 
 if __name__ == "__main__":

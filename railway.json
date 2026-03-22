@@ -2,7 +2,7 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "cd backend && python3 -m venv /app/venv && /app/venv/bin/pip install -r requirements.txt"
+    "buildCommand": "cd frontend && npm ci && npm run build && cd ../backend && python3 -m venv /app/venv && /app/venv/bin/pip install -r requirements.txt && cp -r ../frontend/dist /app/frontend_dist"
   },
   "deploy": {
     "startCommand": "cd backend && /app/venv/bin/uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}",
