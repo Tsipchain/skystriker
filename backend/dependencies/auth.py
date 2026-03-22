@@ -8,7 +8,7 @@ import logging
 
 from fastapi import Depends, Header, HTTPException, status
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
 from dependencies.database import get_db
 from models.platform import Guide
@@ -16,9 +16,9 @@ from models.platform import Guide
 logger = logging.getLogger(__name__)
 
 
-async def get_current_guide(
+def get_current_guide(
     x_guide_id: str = Header(default=""),
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
 ) -> Guide:
     """Return the guide identified by the ``X-Guide-Id`` header.
 
@@ -30,7 +30,7 @@ async def get_current_guide(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Missing X-Guide-Id header",
         )
-    result = await db.execute(select(Guide).where(Guide.id == x_guide_id))
+    result = db.execute(select(Guide).where(Guide.id == x_guide_id))
     guide = result.scalar_one_or_none()
     if not guide:
         raise HTTPException(
@@ -40,7 +40,7 @@ async def get_current_guide(
     return guide
 
 
-async def require_admin(
+def require_admin(
     x_admin_token: str = Header(default=""),
 ) -> bool:
     """Very simple admin gate – expects a static token.

@@ -1,16 +1,17 @@
-"""Async database engine and session factory.
+"""Synchronous database engine and session factory.
+
+Uses synchronous SQLAlchemy to avoid the greenlet / libstdc++ dependency
+that breaks on Railway's nix-based containers.  FastAPI runs sync route
+handlers in a threadpool automatically so there is no performance penalty.
 
 Supports both PostgreSQL (production) and SQLite (local dev / CI).
 """
 
 import logging
-from collections.abc import AsyncIterator
+from collections.abc import Iterator
 
-from sqlalchemy.ext.asyncio import (
-    AsyncSession,
-    async_sessionmaker,
-    create_async_engine,
-)
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from core.config import settings
@@ -19,7 +20,7 @@ from models.base import Base
 logger = logging.getLogger(__name__)
 
 _engine = None
-async_session: async_sessionmaker[AsyncSession] | None = None
+SessionLocal: sessionmaker[Session] | None = None
 
 
 def _get_db_url() -> str:
@@ -27,16 +28,19 @@ def _get_db_url() -> str:
     if url:
         url = url.strip().strip('"').strip("'")
     if not url:
-        return "sqlite+aiosqlite:///./skystriker.db"
+        return "sqlite:///./skystriker.db"
+    # Normalise any PostgreSQL URL to use the psycopg driver
     if url.startswith("postgres://"):
         return url.replace("postgres://", "postgresql+psycopg://", 1)
-    if url.startswith("postgresql://") and "+" not in url:
+    if url.startswith("postgresql+asyncpg://"):
+        return url.replace("postgresql+asyncpg://", "postgresql+psycopg://", 1)
+    if url.startswith("postgresql://") and "+psycopg" not in url:
         return url.replace("postgresql://", "postgresql+psycopg://", 1)
     return url
 
 
-async def initialize_database() -> None:
-    global _engine, async_session
+def initialize_database() -> None:
+    global _engine, SessionLocal
 
     db_url = _get_db_url()
     engine_kwargs: dict = {"echo": settings.debug, "future": True, "pool_pre_ping": True}
@@ -48,29 +52,26 @@ async def initialize_database() -> None:
         engine_kwargs["pool_size"] = 5
         engine_kwargs["max_overflow"] = 10
 
-    _engine = create_async_engine(db_url, **engine_kwargs)
-    async_session = async_sessionmaker(
-        _engine, expire_on_commit=False, class_=AsyncSession
-    )
+    _engine = create_engine(db_url, **engine_kwargs)
+    SessionLocal = sessionmaker(bind=_engine, expire_on_commit=False)
 
     # Import all models so their tables are registered with the metadata
     import models.platform  # noqa: F401
 
-    async with _engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    Base.metadata.create_all(bind=_engine)
 
     logger.info("Database initialised (%s)", "sqlite" if db_url.startswith("sqlite") else "postgresql")
 
 
-async def close_database() -> None:
+def close_database() -> None:
     global _engine
     if _engine is not None:
-        await _engine.dispose()
+        _engine.dispose()
         logger.info("Database connection disposed")
 
 
-async def get_session() -> AsyncIterator[AsyncSession]:
-    if async_session is None:
+def get_session() -> Iterator[Session]:
+    if SessionLocal is None:
         raise RuntimeError("Database session requested before initialization")
-    async with async_session() as session:
+    with SessionLocal() as session:
         yield session

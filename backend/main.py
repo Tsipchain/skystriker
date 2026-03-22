@@ -1,7 +1,7 @@
 """Thronos Chain SkyStriker Global Guides – FastAPI entry-point.
 
 Keeps startup logic minimal:
-1.  Initialise the async DB engine and run ``CREATE TABLE`` for SQLite.
+1.  Initialise the sync DB engine and run ``CREATE TABLE`` for SQLite.
 2.  Optionally seed demo data when ``SEED_DEMO_DATA=true``.
 3.  Mount the three router groups (public, guide, admin) plus health.
 """
@@ -31,14 +31,14 @@ async def lifespan(app: FastAPI):
         format="%(asctime)s  %(name)-30s  %(levelname)-8s  %(message)s",
     )
     logger.info("=== SkyStriker Global Guides – startup ===")
-    await initialize_database()
+    initialize_database()
 
     if settings.seed_demo_data:
         from services.seed import seed_if_empty
-        await seed_if_empty()
+        seed_if_empty()
 
     yield
-    await close_database()
+    close_database()
     logger.info("=== SkyStriker Global Guides – shutdown ===")
 
 

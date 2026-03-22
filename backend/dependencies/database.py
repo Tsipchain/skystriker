@@ -1,11 +1,7 @@
 """Database session dependency for FastAPI routes."""
 
-from services.database import async_session
+from services.database import get_session
 
 
-async def get_db():
-    async with async_session() as session:
-        try:
-            yield session
-        finally:
-            await session.close()
+def get_db():
+    yield from get_session()

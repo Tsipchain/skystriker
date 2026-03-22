@@ -10,8 +10,7 @@ from datetime import datetime
 
 from fastapi import HTTPException
 from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import Session, joinedload
 
 from models.platform import (
     AuditAction,
@@ -47,20 +46,20 @@ def _slugify(text: str) -> str:
 
 
 class PlatformService:
-    def __init__(self, db: AsyncSession):
+    def __init__(self, db: Session):
         self.db = db
 
     # ------------------------------------------------------------------
     # Stats
     # ------------------------------------------------------------------
 
-    async def get_stats(self) -> StatsOut:
-        countries = (await self.db.execute(select(func.count(Country.id)))).scalar() or 0
-        cities = (await self.db.execute(select(func.count(City.id)))).scalar() or 0
-        guides = (await self.db.execute(select(func.count(Guide.id)))).scalar() or 0
-        experiences = (await self.db.execute(select(func.count(Experience.id)))).scalar() or 0
+    def get_stats(self) -> StatsOut:
+        countries = (self.db.execute(select(func.count(Country.id)))).scalar() or 0
+        cities = (self.db.execute(select(func.count(City.id)))).scalar() or 0
+        guides = (self.db.execute(select(func.count(Guide.id)))).scalar() or 0
+        experiences = (self.db.execute(select(func.count(Experience.id)))).scalar() or 0
         verified = (
-            await self.db.execute(
+            self.db.execute(
                 select(func.count(Guide.id)).where(
                     Guide.verification_status == VerificationStatus.verified
                 )
@@ -78,20 +77,20 @@ class PlatformService:
     # Verification
     # ------------------------------------------------------------------
 
-    async def set_verification_status(
+    def set_verification_status(
         self,
         guide_id: str,
         status: VerificationStatus,
         actor: str = "system",
     ) -> Guide:
-        result = await self.db.execute(select(Guide).where(Guide.id == guide_id))
+        result = self.db.execute(select(Guide).where(Guide.id == guide_id))
         guide = result.scalar_one_or_none()
         if not guide:
             raise HTTPException(status_code=404, detail="Guide not found")
 
         old_status = guide.verification_status
         guide.verification_status = status
-        await self._audit(
+        self._audit(
             action=(
                 AuditAction.verification_approved
                 if status == VerificationStatus.verified
@@ -104,15 +103,15 @@ class PlatformService:
             target_id=guide.id,
             detail=f"{old_status.value} -> {status.value}",
         )
-        await self.db.commit()
-        await self.db.refresh(guide)
+        self.db.commit()
+        self.db.refresh(guide)
         return guide
 
     # ------------------------------------------------------------------
     # Experience CRUD
     # ------------------------------------------------------------------
 
-    async def create_experience(self, guide: Guide, payload: ExperienceCreate) -> Experience:
+    def create_experience(self, guide: Guide, payload: ExperienceCreate) -> Experience:
         slug = _slugify(payload.title) + "-" + _uuid()[:8]
         city_id = payload.city_id or guide.city_id
         exp = Experience(
@@ -131,23 +130,23 @@ class PlatformService:
             photo_url=payload.photo_url,
         )
         self.db.add(exp)
-        await self._audit(
+        self._audit(
             AuditAction.experience_created,
             actor=guide.full_name,
             target_type="experience",
             target_id=exp.id,
             detail=payload.title,
         )
-        await self.db.commit()
-        await self.db.refresh(exp)
+        self.db.commit()
+        self.db.refresh(exp)
         return exp
 
     # ------------------------------------------------------------------
     # Bookings
     # ------------------------------------------------------------------
 
-    async def create_booking(self, payload: BookingCreate) -> Booking:
-        result = await self.db.execute(
+    def create_booking(self, payload: BookingCreate) -> Booking:
+        result = self.db.execute(
             select(Experience).where(Experience.id == payload.experience_id)
         )
         exp = result.scalar_one_or_none()
@@ -171,23 +170,23 @@ class PlatformService:
         )
         self.db.add(booking)
         exp.total_bookings = (exp.total_bookings or 0) + 1
-        await self._audit(
+        self._audit(
             AuditAction.booking_requested,
             actor=payload.guest_email,
             target_type="booking",
             target_id=booking.id,
             detail=f"{exp.title} on {payload.requested_date}",
         )
-        await self.db.commit()
-        await self.db.refresh(booking)
+        self.db.commit()
+        self.db.refresh(booking)
         return booking
 
     # ------------------------------------------------------------------
     # Reviews
     # ------------------------------------------------------------------
 
-    async def create_review(self, payload: ReviewCreate) -> Review:
-        result = await self.db.execute(
+    def create_review(self, payload: ReviewCreate) -> Review:
+        result = self.db.execute(
             select(Experience).where(Experience.id == payload.experience_id)
         )
         exp = result.scalar_one_or_none()
@@ -207,41 +206,41 @@ class PlatformService:
 
         # update averages
         all_reviews = (
-            await self.db.execute(
+            self.db.execute(
                 select(Review.rating).where(Review.experience_id == exp.id)
             )
         ).scalars().all()
         ratings = list(all_reviews) + [review.rating]
         exp.avg_rating = round(sum(ratings) / len(ratings), 2)
 
-        guide_result = await self.db.execute(select(Guide).where(Guide.id == exp.guide_id))
+        guide_result = self.db.execute(select(Guide).where(Guide.id == exp.guide_id))
         guide = guide_result.scalar_one_or_none()
         if guide:
             guide.total_reviews = (guide.total_reviews or 0) + 1
             guide_reviews = (
-                await self.db.execute(
+                self.db.execute(
                     select(Review.rating).where(Review.guide_id == guide.id)
                 )
             ).scalars().all()
             all_guide_ratings = list(guide_reviews) + [review.rating]
             guide.rating = round(sum(all_guide_ratings) / len(all_guide_ratings), 2)
 
-        await self._audit(
+        self._audit(
             AuditAction.review_submitted,
             actor=payload.reviewer_name,
             target_type="review",
             target_id=review.id,
             detail=f"{payload.rating}/5 for {exp.title}",
         )
-        await self.db.commit()
-        await self.db.refresh(review)
+        self.db.commit()
+        self.db.refresh(review)
         return review
 
     # ------------------------------------------------------------------
     # Audit helper
     # ------------------------------------------------------------------
 
-    async def _audit(
+    def _audit(
         self,
         action: AuditAction,
         actor: str = "system",

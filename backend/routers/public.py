@@ -9,8 +9,7 @@ import re
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import Session, joinedload
 
 from dependencies.database import get_db
 from models.platform import (
@@ -50,9 +49,9 @@ router = APIRouter(prefix="/api/v1/public", tags=["public"])
 # ---------------------------------------------------------------------------
 
 @router.get("/stats", response_model=StatsOut)
-async def platform_stats(db: AsyncSession = Depends(get_db)):
+def platform_stats(db: Session = Depends(get_db)):
     svc = PlatformService(db)
-    return await svc.get_stats()
+    return svc.get_stats()
 
 
 # ---------------------------------------------------------------------------
@@ -60,8 +59,8 @@ async def platform_stats(db: AsyncSession = Depends(get_db)):
 # ---------------------------------------------------------------------------
 
 @router.get("/countries", response_model=list[CountryOut])
-async def list_countries(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(
+def list_countries(db: Session = Depends(get_db)):
+    result = db.execute(
         select(Country).where(Country.is_active == True).order_by(Country.name)
     )
     return result.scalars().all()
@@ -72,9 +71,9 @@ async def list_countries(db: AsyncSession = Depends(get_db)):
 # ---------------------------------------------------------------------------
 
 @router.get("/cities", response_model=list[CityOut])
-async def list_cities(
+def list_cities(
     country_id: str | None = None,
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
 ):
     q = (
         select(City)
@@ -84,7 +83,7 @@ async def list_cities(
     )
     if country_id:
         q = q.where(City.country_id == country_id)
-    result = await db.execute(q)
+    result = db.execute(q)
     cities = result.unique().scalars().all()
 
     out: list[CityOut] = []
@@ -97,8 +96,8 @@ async def list_cities(
 
 
 @router.get("/cities/{slug}", response_model=CityDetail)
-async def city_detail(slug: str, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(
+def city_detail(slug: str, db: Session = Depends(get_db)):
+    result = db.execute(
         select(City)
         .options(
             joinedload(City.country),
@@ -127,10 +126,10 @@ async def city_detail(slug: str, db: AsyncSession = Depends(get_db)):
 # ---------------------------------------------------------------------------
 
 @router.get("/guides", response_model=list[GuideCard])
-async def list_guides(
+def list_guides(
     city_id: str | None = None,
     verification: str | None = None,
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
 ):
     q = (
         select(Guide)
@@ -142,13 +141,13 @@ async def list_guides(
         q = q.where(Guide.city_id == city_id)
     if verification:
         q = q.where(Guide.verification_status == verification)
-    result = await db.execute(q)
+    result = db.execute(q)
     return result.unique().scalars().all()
 
 
 @router.get("/guides/{guide_id}", response_model=GuideDetail)
-async def guide_detail(guide_id: str, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(
+def guide_detail(guide_id: str, db: Session = Depends(get_db)):
+    result = db.execute(
         select(Guide)
         .options(
             joinedload(Guide.city).joinedload(City.country),
@@ -168,11 +167,11 @@ async def guide_detail(guide_id: str, db: AsyncSession = Depends(get_db)):
 # ---------------------------------------------------------------------------
 
 @router.get("/experiences", response_model=list[ExperienceCard])
-async def list_experiences(
+def list_experiences(
     city_id: str | None = None,
     guide_id: str | None = None,
     category: str | None = None,
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
 ):
     q = (
         select(Experience)
@@ -189,13 +188,13 @@ async def list_experiences(
         q = q.where(Experience.guide_id == guide_id)
     if category:
         q = q.where(Experience.category == category)
-    result = await db.execute(q)
+    result = db.execute(q)
     return result.unique().scalars().all()
 
 
 @router.get("/experiences/{slug}", response_model=ExperienceCard)
-async def experience_detail(slug: str, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(
+def experience_detail(slug: str, db: Session = Depends(get_db)):
+    result = db.execute(
         select(Experience)
         .options(joinedload(Experience.guide), joinedload(Experience.city))
         .where(Experience.slug == slug)
@@ -211,9 +210,9 @@ async def experience_detail(slug: str, db: AsyncSession = Depends(get_db)):
 # ---------------------------------------------------------------------------
 
 @router.post("/bookings", response_model=BookingOut, status_code=201)
-async def create_booking(payload: BookingCreate, db: AsyncSession = Depends(get_db)):
+def create_booking(payload: BookingCreate, db: Session = Depends(get_db)):
     svc = PlatformService(db)
-    return await svc.create_booking(payload)
+    return svc.create_booking(payload)
 
 
 # ---------------------------------------------------------------------------
@@ -221,21 +220,21 @@ async def create_booking(payload: BookingCreate, db: AsyncSession = Depends(get_
 # ---------------------------------------------------------------------------
 
 @router.post("/reviews", response_model=ReviewOut, status_code=201)
-async def create_review(payload: ReviewCreate, db: AsyncSession = Depends(get_db)):
+def create_review(payload: ReviewCreate, db: Session = Depends(get_db)):
     svc = PlatformService(db)
-    return await svc.create_review(payload)
+    return svc.create_review(payload)
 
 
 @router.get("/reviews", response_model=list[ReviewOut])
-async def list_reviews(
+def list_reviews(
     experience_id: str | None = None,
     guide_id: str | None = None,
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
 ):
     q = select(Review).where(Review.is_published == True).order_by(Review.created_at.desc()).limit(100)
     if experience_id:
         q = q.where(Review.experience_id == experience_id)
     if guide_id:
         q = q.where(Review.guide_id == guide_id)
-    result = await db.execute(q)
+    result = db.execute(q)
     return result.scalars().all()

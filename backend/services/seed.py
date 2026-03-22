@@ -16,7 +16,7 @@ from models.platform import (
     Guide,
     VerificationStatus,
 )
-from services.database import async_session
+from services.database import SessionLocal
 
 logger = logging.getLogger(__name__)
 
@@ -25,13 +25,13 @@ def _uuid() -> str:
     return str(uuid.uuid4())
 
 
-async def seed_if_empty() -> None:
-    if async_session is None:
+def seed_if_empty() -> None:
+    if SessionLocal is None:
         logger.warning("seed_if_empty called before DB init – skipping")
         return
 
-    async with async_session() as db:
-        count = (await db.execute(select(func.count(Country.id)))).scalar()
+    with SessionLocal() as db:
+        count = (db.execute(select(func.count(Country.id)))).scalar()
         if count and count > 0:
             logger.info("Database already seeded (%d countries) – skipping", count)
             return
@@ -224,7 +224,7 @@ async def seed_if_empty() -> None:
         ]
         db.add_all(experiences)
 
-        await db.commit()
+        db.commit()
         logger.info(
             "Demo data seeded: %d countries, %d cities, %d guides, %d experiences",
             6, 8, 5, len(experiences),
