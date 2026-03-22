@@ -29,9 +29,9 @@ def _get_db_url() -> str:
     if not url:
         return "sqlite+aiosqlite:///./skystriker.db"
     if url.startswith("postgres://"):
-        return url.replace("postgres://", "postgresql+asyncpg://", 1)
+        return url.replace("postgres://", "postgresql+psycopg://", 1)
     if url.startswith("postgresql://") and "+" not in url:
-        return url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        return url.replace("postgresql://", "postgresql+psycopg://", 1)
     return url
 
 
