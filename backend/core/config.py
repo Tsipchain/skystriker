@@ -54,6 +54,9 @@ class Settings(BaseSettings):
     seed_demo_data: bool = True
     default_country_code: str = "gr"
 
+    # Platform commission (0.22 = 22%)
+    platform_commission_rate: float = 0.22
+
     cors_allow_origins: str = ""
 
     class Config:

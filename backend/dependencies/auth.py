@@ -38,6 +38,19 @@ def get_current_guide(
                 ).scalar_one_or_none()
                 if guide:
                     return guide
+                # Auto-create Guide record for users with guide role
+                if user.role.value == "guide":
+                    logger.info("Auth: auto-creating guide record for user %s", user.id)
+                    guide = Guide(
+                        user_id=user.id,
+                        full_name=user.full_name,
+                        email=user.email,
+                        avatar_url=user.avatar_url or "",
+                    )
+                    db.add(guide)
+                    db.commit()
+                    db.refresh(guide)
+                    return guide
                 logger.warning("Auth: user %s found but no guide record (user_id match)", user.id)
             else:
                 logger.warning("Auth: JWT valid but user %s not in DB", payload.get("sub"))

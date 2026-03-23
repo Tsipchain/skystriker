@@ -51,7 +51,12 @@ export default function GuideBookingRequests() {
                     {b.requested_date} at {b.requested_time} · {b.guests_count} {b.guests_count !== 1 ? t('guests_plural') : t('guest')}
                   </p>
                   <p className="text-sm text-gray-500">
-                    {b.currency} {b.total_price.toFixed(2)}
+                    {t('total')}: {b.currency} {b.total_price.toFixed(2)}
+                    {b.guide_payout > 0 && (
+                      <span className="text-green-600 font-medium ml-2">
+                        ({t('your_payout')}: {b.currency} {b.guide_payout.toFixed(2)})
+                      </span>
+                    )}
                   </p>
                   {b.note && <p className="text-sm text-gray-400 mt-1 italic">"{b.note}"</p>}
                 </div>

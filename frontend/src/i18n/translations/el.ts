@@ -243,6 +243,15 @@ const el = {
   notifications_coming: 'Οι ρυθμίσεις ειδοποιήσεων email θα είναι διαθέσιμες σε μελλοντική ενημέρωση.',
   payment_settings: 'Ρυθμίσεις Πληρωμής',
   payment_coming: 'Η ρύθμιση μεθόδων πληρωμής θα είναι διαθέσιμη σε μελλοντική ενημέρωση.',
+  payment_desc: 'Ρύθμισε πώς λαμβάνεις πληρωμές από κρατήσεις.',
+  commission_info: 'Προμήθεια πλατφόρμας: 22% ανά κράτηση',
+  commission_detail: 'Λαμβάνεις 78% του συνόλου κάθε κράτησης. Η πλατφόρμα κρατά 22% για λειτουργία, υποστήριξη και marketing.',
+  payment_method: 'Μέθοδος Πληρωμής',
+  stripe_account_id: 'Stripe Account ID',
+  stripe_help: 'Το Stripe Connect account ID σου. Δημιούργησε ένα στο stripe.com αν δεν έχεις.',
+  crypto_wallet: 'Διεύθυνση Πορτοφολιού',
+  crypto_help: 'Η διεύθυνση του crypto πορτοφολιού σου (ETH, BTC, USDT, κλπ.)',
+  payment_saved: 'Οι ρυθμίσεις πληρωμής αποθηκεύτηκαν!',
   danger_zone: 'Επικίνδυνη Ζώνη',
   demo_session: 'Χρησιμοποιείς demo session.',
   sign_up_save: 'Κάνε εγγραφή για να αποθηκεύσεις τα δεδομένα σου.',
@@ -319,6 +328,7 @@ const el = {
   no_experiences_found: 'Δεν βρέθηκαν εμπειρίες.',
   guest: 'επισκέπτης',
   guests_plural: 'επισκέπτες',
+  your_payout: 'Η πληρωμή σου',
 }
 
 export default el

@@ -192,6 +192,10 @@ class Guide(Base):
     is_active = Column(Boolean, default=True)
     rating = Column(Float, default=0.0)
     total_reviews = Column(Integer, default=0)
+    # Payment settings
+    payment_method = Column(String(20), default="")       # "stripe", "crypto", or ""
+    stripe_account_id = Column(String(255), default="")   # Stripe Connect account ID
+    crypto_wallet_address = Column(String(255), default="")  # Crypto wallet address
     created_at = Column(DateTime, default=_utcnow, nullable=False)
     updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow, nullable=False)
 
@@ -252,6 +256,8 @@ class Booking(Base):
     requested_time = Column(String(5), default="10:00")       # HH:MM
     guests_count = Column(Integer, default=1)
     total_price = Column(Float, default=0.0)
+    platform_fee = Column(Float, default=0.0)         # 22% commission
+    guide_payout = Column(Float, default=0.0)          # 78% to guide
     currency = Column(String(6), default="EUR")
     status = Column(Enum(BookingStatus), default=BookingStatus.requested)
     note = Column(Text, default="")

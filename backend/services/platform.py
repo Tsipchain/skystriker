@@ -25,6 +25,7 @@ from models.platform import (
     Review,
     VerificationStatus,
 )
+from core.config import settings
 from schemas.platform import (
     BookingCreate,
     ExperienceCreate,
@@ -153,7 +154,9 @@ class PlatformService:
         if not exp:
             raise HTTPException(status_code=404, detail="Experience not found")
 
-        total = exp.price * payload.guests_count
+        total = round(exp.price * payload.guests_count, 2)
+        platform_fee = round(total * settings.platform_commission_rate, 2)
+        guide_payout = round(total - platform_fee, 2)
         booking = Booking(
             id=_uuid(),
             experience_id=exp.id,
@@ -165,6 +168,8 @@ class PlatformService:
             requested_time=payload.requested_time,
             guests_count=payload.guests_count,
             total_price=total,
+            platform_fee=platform_fee,
+            guide_payout=guide_payout,
             currency=exp.currency,
             note=payload.note,
         )

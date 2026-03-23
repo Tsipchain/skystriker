@@ -93,6 +93,9 @@ class GuideDetail(GuideCard):
     phone: str = ""
     verifyid_reference: str = ""
     is_active: bool = True
+    payment_method: str = ""
+    stripe_account_id: str = ""
+    crypto_wallet_address: str = ""
     created_at: Optional[datetime] = None
     experiences: list[ExperienceCard] = []
 
@@ -104,6 +107,9 @@ class GuideProfileUpdate(BaseModel):
     phone: Optional[str] = None
     languages: Optional[str] = None
     specialties: Optional[str] = None
+    payment_method: Optional[str] = None
+    stripe_account_id: Optional[str] = None
+    crypto_wallet_address: Optional[str] = None
 
 
 # ---------------------------------------------------------------------------
@@ -196,6 +202,8 @@ class BookingOut(BaseModel):
     requested_time: str = "10:00"
     guests_count: int = 1
     total_price: float = 0.0
+    platform_fee: float = 0.0
+    guide_payout: float = 0.0
     currency: str = "EUR"
     status: str = "requested"
     note: str = ""

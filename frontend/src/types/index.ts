@@ -51,6 +51,9 @@ export interface GuideDetail extends GuideCard {
   phone: string
   verifyid_reference: string
   is_active: boolean
+  payment_method: string
+  stripe_account_id: string
+  crypto_wallet_address: string
   created_at: string | null
   experiences: ExperienceCard[]
 }
@@ -87,6 +90,8 @@ export interface Booking {
   requested_time: string
   guests_count: number
   total_price: number
+  platform_fee: number
+  guide_payout: number
   currency: string
   status: string
   note: string

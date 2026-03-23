@@ -243,6 +243,15 @@ const en = {
   notifications_coming: 'Email notification preferences will be available in a future update.',
   payment_settings: 'Payment Settings',
   payment_coming: 'Payment method configuration and payout settings will be available in a future update.',
+  payment_desc: 'Configure how you receive payments from bookings.',
+  commission_info: 'Platform commission: 22% per booking',
+  commission_detail: 'You receive 78% of each booking total. The platform retains 22% for operations, support, and marketing.',
+  payment_method: 'Payment Method',
+  stripe_account_id: 'Stripe Account ID',
+  stripe_help: 'Your Stripe Connect account ID. Create one at stripe.com if you don\'t have one.',
+  crypto_wallet: 'Wallet Address',
+  crypto_help: 'Your cryptocurrency wallet address (ETH, BTC, USDT, etc.)',
+  payment_saved: 'Payment settings saved successfully!',
   danger_zone: 'Danger Zone',
   demo_session: 'You are using a demo guide session.',
   sign_up_save: 'Sign up to save your data.',
@@ -319,6 +328,7 @@ const en = {
   no_experiences_found: 'No experiences found.',
   guest: 'guest',
   guests_plural: 'guests',
+  your_payout: 'Your payout',
 }
 
 export default en
