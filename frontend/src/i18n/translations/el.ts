@@ -337,6 +337,7 @@ const el = {
   guide_payout_label: 'Πληρωμή ξεναγού',
   payout: 'Πληρωμή',
   release_payout: 'Αποδέσμευση Πληρωμής',
+  blockchain_hash: 'Blockchain hash',
 }
 
 export default el

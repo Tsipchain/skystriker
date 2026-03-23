@@ -39,8 +39,21 @@ def get_current_guide(
                 ).scalar_one_or_none()
                 if guide:
                     return guide
-                # Auto-create Guide record for users with guide role
+                # Auto-create or link Guide record for users with guide role
                 if user.role.value == "guide":
+                    # Check if a guide with this email already exists (e.g. from seed data)
+                    guide = db.execute(
+                        select(Guide).where(Guide.email == user.email)
+                    ).scalar_one_or_none()
+                    if guide:
+                        # Link existing guide to this user
+                        if not guide.user_id:
+                            guide.user_id = user.id
+                            db.commit()
+                            db.refresh(guide)
+                        logger.info("Auth: linked existing guide %s to user %s", guide.id, user.id)
+                        return guide
+                    # Create new guide record
                     logger.info("Auth: auto-creating guide record for user %s", user.id)
                     guide = Guide(
                         user_id=user.id,

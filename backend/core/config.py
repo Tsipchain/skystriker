@@ -62,6 +62,11 @@ class Settings(BaseSettings):
     admin_password: str = "SkyStriker2026!"
     admin_token: str = "skystriker-admin"
 
+    # Thronos blockchain nodes
+    thronos_node1_url: str = "https://thrchain.up.railway.app"
+    thronos_node2_url: str = "https://node-2.up.railway.app"
+    thronos_admin_secret: str = ""
+
     cors_allow_origins: str = ""
 
     class Config:

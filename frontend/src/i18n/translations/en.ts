@@ -337,6 +337,7 @@ const en = {
   guide_payout_label: 'Guide payout',
   payout: 'Payout',
   release_payout: 'Release Payout',
+  blockchain_hash: 'Blockchain hash',
 }
 
 export default en

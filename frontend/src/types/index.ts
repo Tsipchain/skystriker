@@ -93,6 +93,7 @@ export interface Booking {
   platform_fee: number
   guide_payout: number
   payout_status: string
+  payout_tx_hash: string
   currency: string
   status: string
   note: string

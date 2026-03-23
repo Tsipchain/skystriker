@@ -167,14 +167,23 @@ def get_or_create_google_user(
                 select(Guide).where(Guide.user_id == user.id)
             ).scalar_one_or_none()
             if not existing_guide:
-                guide = Guide(
-                    user_id=user.id,
-                    full_name=user.full_name,
-                    email=user.email,
-                    avatar_url=user.avatar_url or google_data.get("picture", ""),
-                )
-                db.add(guide)
-                logger.info("Auto-created guide record for existing user %s", user.id)
+                # Check by email too (seed guides have no user_id)
+                existing_guide = db.execute(
+                    select(Guide).where(Guide.email == user.email)
+                ).scalar_one_or_none()
+                if existing_guide:
+                    # Link existing guide record to this user
+                    existing_guide.user_id = user.id
+                    logger.info("Linked existing guide %s to user %s", existing_guide.id, user.id)
+                else:
+                    guide = Guide(
+                        user_id=user.id,
+                        full_name=user.full_name,
+                        email=user.email,
+                        avatar_url=user.avatar_url or google_data.get("picture", ""),
+                    )
+                    db.add(guide)
+                    logger.info("Auto-created guide record for existing user %s", user.id)
         db.commit()
         db.refresh(user)
         return user
@@ -191,13 +200,21 @@ def get_or_create_google_user(
     db.add(user)
 
     if role == "guide":
-        guide = Guide(
-            user_id=user.id,
-            full_name=user.full_name,
-            email=user.email,
-            avatar_url=user.avatar_url,
-        )
-        db.add(guide)
+        # Check if guide with this email exists (e.g. from seed data)
+        existing_guide = db.execute(
+            select(Guide).where(Guide.email == email)
+        ).scalar_one_or_none()
+        if existing_guide:
+            existing_guide.user_id = user.id
+            logger.info("Linked existing guide %s to new user %s", existing_guide.id, user.id)
+        else:
+            guide = Guide(
+                user_id=user.id,
+                full_name=user.full_name,
+                email=user.email,
+                avatar_url=user.avatar_url,
+            )
+            db.add(guide)
 
     db.commit()
     db.refresh(user)

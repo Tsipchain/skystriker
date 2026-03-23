@@ -170,24 +170,51 @@ def admin_list_bookings(
 
 @router.post("/bookings/{booking_id}/release-payout")
 def release_payout(booking_id: str, db: Session = Depends(get_db)):
-    """Admin releases payout to guide after reviewing the completed booking."""
-    result = db.execute(select(Booking).where(Booking.id == booking_id))
-    booking = result.scalar_one_or_none()
+    """Admin releases payout to guide – hashes the payout and submits to Thronos blockchain."""
+    from services.blockchain import thronos_blockchain
+
+    result = db.execute(
+        select(Booking).options(joinedload(Booking.guide)).where(Booking.id == booking_id)
+    )
+    booking = result.unique().scalars().first()
     if not booking:
         raise HTTPException(status_code=404, detail="Booking not found")
     if booking.status != BookingStatus.completed:
         raise HTTPException(status_code=400, detail="Booking must be completed before payout release")
+
+    # Hash & submit to Thronos blockchain
+    guide_email = booking.guide.email if booking.guide else "unknown"
+    chain_result = thronos_blockchain.submit_payout_to_chain(
+        booking_id=booking.id,
+        guide_id=booking.guide_id,
+        guide_email=guide_email,
+        amount=booking.guide_payout,
+        currency=booking.currency,
+        platform_fee=booking.platform_fee,
+    )
+
     booking.payout_status = "released"
+    booking.payout_tx_hash = chain_result.get("tx_hash", "")
+
     svc = PlatformService(db)
     svc._audit(
         AuditAction.admin_action,
         actor="admin",
         target_type="booking",
         target_id=booking.id,
-        detail=f"Payout released: {booking.currency} {booking.guide_payout:.2f} to guide",
+        detail=(
+            f"Payout released: {booking.currency} {booking.guide_payout:.2f} to guide | "
+            f"Blockchain hash: {booking.payout_tx_hash[:16]}... | "
+            f"Chain submitted: {chain_result['success']}"
+        ),
     )
     db.commit()
-    return {"payout_status": "released", "guide_payout": booking.guide_payout}
+    return {
+        "payout_status": "released",
+        "guide_payout": booking.guide_payout,
+        "tx_hash": booking.payout_tx_hash,
+        "blockchain_submitted": chain_result["success"],
+    }
 
 
 @router.get("/audit", response_model=list[AuditLogOut])

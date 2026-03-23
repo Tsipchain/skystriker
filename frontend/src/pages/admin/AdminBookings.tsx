@@ -111,6 +111,15 @@ export default function AdminBookings() {
                       {t('guide_payout_label')}: {b.currency} {b.guide_payout.toFixed(2)}
                     </span>
                   </div>
+                  {b.payout_tx_hash && (
+                    <div className="mt-2 flex items-center gap-2">
+                      <span className="text-xs text-gray-400">{t('blockchain_hash')}:</span>
+                      <code className="text-xs bg-gray-100 px-2 py-0.5 rounded font-mono text-purple-700">
+                        {b.payout_tx_hash.slice(0, 16)}...{b.payout_tx_hash.slice(-8)}
+                      </code>
+                      <span className="text-xs text-green-500 font-medium">Thronos Network</span>
+                    </div>
+                  )}
                 </div>
                 <div className="flex flex-col items-end gap-2">
                   <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${payoutColor(b.payout_status)}`}>
