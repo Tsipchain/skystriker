@@ -185,10 +185,17 @@ class Guide(Base):
     languages = Column(Text, default="")          # comma-separated
     specialties = Column(Text, default="")         # comma-separated
     city_id = Column(String(36), ForeignKey("cities.id"), nullable=True)
+    service_city_ids = Column(Text, default="")           # comma-separated city IDs where guide operates
     verification_status = Column(
         Enum(VerificationStatus), default=VerificationStatus.unverified, nullable=False,
     )
     verifyid_reference = Column(String(200), default="")
+    # Verification documents
+    id_document_url = Column(Text, default="")            # uploaded government ID
+    selfie_url = Column(Text, default="")                 # selfie for liveness check
+    guide_license_url = Column(Text, default="")          # optional guide license
+    fraud_score = Column(Float, nullable=True)            # AI fraud detection score (0-100)
+    fraud_notes = Column(Text, default="")                # notes from fraud detector
     is_active = Column(Boolean, default=True)
     rating = Column(Float, default=0.0)
     total_reviews = Column(Integer, default=0)

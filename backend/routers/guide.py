@@ -4,10 +4,13 @@ Routes that require a valid ``X-Guide-Id`` header identifying the
 currently-logged-in guide.
 """
 
+import base64
 import logging
+import os
 import re
+import uuid
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 
@@ -29,11 +32,15 @@ from schemas.platform import (
     GuideDetail,
     GuideProfileUpdate,
     ReviewOut,
+    VerificationSubmit,
 )
 from services.platform import PlatformService
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/guide", tags=["guide"])
+
+UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static", "uploads")
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 # ---------------------------------------------------------------------------
@@ -71,19 +78,95 @@ def update_profile(
 
 
 # ---------------------------------------------------------------------------
+# File upload
+# ---------------------------------------------------------------------------
+
+@router.post("/upload")
+async def upload_file(
+    file: UploadFile = File(...),
+    guide: Guide = Depends(get_current_guide),
+):
+    """Upload a file (avatar, ID document, selfie, license). Returns the URL."""
+    ext = os.path.splitext(file.filename or "file.jpg")[1].lower()
+    if ext not in (".jpg", ".jpeg", ".png", ".webp", ".pdf"):
+        raise HTTPException(status_code=400, detail="Unsupported file type")
+    if file.size and file.size > 10 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="File too large (max 10MB)")
+
+    filename = f"{guide.id}_{uuid.uuid4().hex[:8]}{ext}"
+    filepath = os.path.join(UPLOAD_DIR, filename)
+    content = await file.read()
+    with open(filepath, "wb") as f:
+        f.write(content)
+    url = f"/static/uploads/{filename}"
+    return {"url": url}
+
+
+# ---------------------------------------------------------------------------
 # Verification
 # ---------------------------------------------------------------------------
 
 @router.post("/verification/submit")
 def submit_verification(
+    payload: VerificationSubmit,
     guide: Guide = Depends(get_current_guide),
     db: Session = Depends(get_db),
 ):
+    """Submit verification with documents. Calls VerifyID agent if available."""
+    if not payload.id_document_url or not payload.selfie_url:
+        raise HTTPException(status_code=400, detail="ID document and selfie are required")
+
+    # Store document URLs
+    guide.id_document_url = payload.id_document_url
+    guide.selfie_url = payload.selfie_url
+    if payload.guide_license_url:
+        guide.guide_license_url = payload.guide_license_url
+
+    # Attempt VerifyID agent call
+    fraud_score = None
+    fraud_notes = ""
+    verifyid_ref = ""
+    try:
+        from core.config import settings
+        import httpx
+        verify_url = settings.verifyid_base_url.rstrip("/")
+        resp = httpx.post(
+            f"{verify_url}/verify",
+            json={
+                "guide_id": guide.id,
+                "full_name": guide.full_name,
+                "id_document_url": payload.id_document_url,
+                "selfie_url": payload.selfie_url,
+                "guide_license_url": payload.guide_license_url or "",
+            },
+            timeout=15.0,
+        )
+        if resp.status_code == 200:
+            data = resp.json()
+            verifyid_ref = data.get("reference", "")
+            fraud_score = data.get("fraud_score")
+            fraud_notes = data.get("notes", "")
+            logger.info("VerifyID response for guide %s: ref=%s score=%s", guide.id, verifyid_ref, fraud_score)
+    except Exception as e:
+        # VerifyID agent not available – fall back to manual review by manager
+        logger.warning("VerifyID agent unavailable for guide %s: %s – routing to manager", guide.id, e)
+        fraud_notes = "VerifyID agent unavailable – routed to manager for manual review"
+
+    guide.verifyid_reference = verifyid_ref
+    if fraud_score is not None:
+        guide.fraud_score = fraud_score
+    guide.fraud_notes = fraud_notes
+
     svc = PlatformService(db)
     updated = svc.set_verification_status(
         guide.id, VerificationStatus.pending, actor=guide.full_name
     )
-    return {"status": updated.verification_status.value}
+    return {
+        "status": updated.verification_status.value,
+        "verifyid_reference": verifyid_ref,
+        "fraud_score": fraud_score,
+        "fraud_notes": fraud_notes,
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -116,6 +199,11 @@ def create_experience(
     guide: Guide = Depends(get_current_guide),
     db: Session = Depends(get_db),
 ):
+    if guide.verification_status != VerificationStatus.verified:
+        raise HTTPException(
+            status_code=403,
+            detail="Only verified guides can create experiences. Please complete verification first.",
+        )
     svc = PlatformService(db)
     return svc.create_experience(guide, payload)
 

@@ -63,6 +63,7 @@ class GuideCard(BaseModel):
     specialties: list[str] = []
     city_name: str = ""
     country_name: str = ""
+    service_city_ids: list[str] = []
     verification_status: str = "unverified"
     rating: float = 0.0
     total_reviews: int = 0
@@ -80,7 +81,7 @@ class GuideCard(BaseModel):
             return d
         return values
 
-    @field_validator("languages", "specialties", mode="before")
+    @field_validator("languages", "specialties", "service_city_ids", mode="before")
     @classmethod
     def _csv_to_list(cls, v):
         if isinstance(v, str):
@@ -96,6 +97,11 @@ class GuideDetail(GuideCard):
     payment_method: str = ""
     stripe_account_id: str = ""
     crypto_wallet_address: str = ""
+    id_document_url: str = ""
+    selfie_url: str = ""
+    guide_license_url: str = ""
+    fraud_score: Optional[float] = None
+    fraud_notes: str = ""
     created_at: Optional[datetime] = None
     experiences: list[ExperienceCard] = []
 
@@ -107,9 +113,17 @@ class GuideProfileUpdate(BaseModel):
     phone: Optional[str] = None
     languages: Optional[str] = None
     specialties: Optional[str] = None
+    city_id: Optional[str] = None
+    service_city_ids: Optional[str] = None
     payment_method: Optional[str] = None
     stripe_account_id: Optional[str] = None
     crypto_wallet_address: Optional[str] = None
+
+
+class VerificationSubmit(BaseModel):
+    id_document_url: str
+    selfie_url: str
+    guide_license_url: str = ""
 
 
 # ---------------------------------------------------------------------------

@@ -41,6 +41,7 @@ export interface GuideCard {
   specialties: string[]
   city_name: string
   country_name: string
+  service_city_ids: string[]
   verification_status: string
   rating: number
   total_reviews: number
@@ -54,6 +55,11 @@ export interface GuideDetail extends GuideCard {
   payment_method: string
   stripe_account_id: string
   crypto_wallet_address: string
+  id_document_url: string
+  selfie_url: string
+  guide_license_url: string
+  fraud_score: number | null
+  fraud_notes: string
   created_at: string | null
   experiences: ExperienceCard[]
 }

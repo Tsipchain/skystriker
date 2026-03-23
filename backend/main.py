@@ -77,6 +77,11 @@ app.include_router(admin_router)
 app.include_router(availability_router)
 app.include_router(translator_router)
 
+# Serve uploaded files
+_uploads_dir = Path(__file__).resolve().parent / "static" / "uploads"
+_uploads_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/static/uploads", StaticFiles(directory=_uploads_dir), name="uploads")
+
 
 # ---------------------------------------------------------------------------
 # Serve frontend SPA (built files copied to /app/frontend_dist at deploy)

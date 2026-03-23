@@ -53,6 +53,7 @@ router = APIRouter(prefix="/api/v1/public", tags=["public"])
 def client_config():
     return {
         "google_client_id": settings.google_client_id or "",
+        "etherfi_referral_url": settings.etherfi_referral_url,
     }
 
 

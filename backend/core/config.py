@@ -67,6 +67,9 @@ class Settings(BaseSettings):
     thronos_node2_url: str = "https://node-2.up.railway.app"
     thronos_admin_secret: str = ""
 
+    # Ether.fi debit card referral
+    etherfi_referral_url: str = "https://app.ether.fi/card"
+
     cors_allow_origins: str = ""
 
     class Config:

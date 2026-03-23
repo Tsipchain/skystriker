@@ -338,6 +338,64 @@ const en = {
   payout: 'Payout',
   release_payout: 'Release Payout',
   blockchain_hash: 'Blockchain hash',
+
+  // Guide Profile Enhanced
+  profile_photo: 'Profile Photo',
+  change: 'Change',
+  upload_photo: 'Upload Photo',
+  uploading: 'Uploading…',
+  photo_hint: 'JPG, PNG or WebP. Max 10MB.',
+  basic_info: 'Basic Information',
+  location_service_areas: 'Location & Service Areas',
+  service_areas_desc: 'Select your primary city and the cities/areas where you offer services.',
+  primary_city: 'Primary City',
+  select_city: 'Select a city…',
+  service_cities: 'Service Cities',
+  cities_selected: 'cities selected',
+  description: 'Description',
+  share: 'Share',
+  link_copied: 'Link copied to clipboard!',
+
+  // Verification Enhanced
+  verification_steps_title: 'Document Verification Required',
+  verification_steps_desc: 'Upload your ID document and a selfie to verify your identity. If you are a licensed guide, upload your guide license too.',
+  upload_id_document: 'Government ID',
+  upload_id_desc: 'Upload a clear photo or scan of your government-issued ID (passport, national ID, or driving license).',
+  upload_selfie: 'Selfie Photo',
+  upload_selfie_desc: 'Take a clear selfie holding your ID next to your face for liveness verification.',
+  upload_guide_license: 'Guide License',
+  upload_license_desc: 'If you hold an official guide license, upload it here for priority verification.',
+  document_uploaded: 'Document uploaded',
+  selfie_uploaded: 'Selfie uploaded',
+  license_uploaded: 'License uploaded',
+  click_to_upload_id: 'Click to upload your ID document',
+  click_to_upload_selfie: 'Click to upload your selfie',
+  click_to_upload_license: 'Click to upload your guide license',
+  optional: 'Optional',
+  upload_failed: 'Upload failed. Please try again.',
+  id_and_selfie_required: 'ID document and selfie are required.',
+  powered_by_verifyid: 'Powered by ThronosChain VerifyID',
+  verifyid_desc: 'Your documents are reviewed by our AI-powered fraud detection system and verified through ThronosChain VerifyID. If the VerifyID agent is unavailable, your submission will be routed to our verification manager for manual review.',
+  fraud_score: 'Trust score',
+
+  // Experiences Enhanced
+  create_experience: 'Create Experience',
+  create_new_experience: 'Create New Experience',
+  experience_photo: 'Experience Photo',
+  create_first_experience: 'Click "Create Experience" to get started.',
+  verification_required_title: 'Verification Required',
+  verification_required_desc: 'You need to complete identity verification before you can create experiences. Go to the Verification page to get started.',
+
+  // Debit Card
+  your_name: 'YOUR NAME',
+  get_debit_card: 'Get Your Debit Card',
+  debit_card_desc: 'Spend your guide earnings instantly with a crypto-powered debit card. No bank needed.',
+  get_your_card: 'Get Your Card',
+
+  // Admin Verification Enhanced
+  submitted_documents: 'Submitted Documents',
+  no_document: 'No document',
+  not_provided: 'Not provided',
 }
 
 export default en

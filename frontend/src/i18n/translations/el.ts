@@ -338,6 +338,64 @@ const el = {
   payout: 'Πληρωμή',
   release_payout: 'Αποδέσμευση Πληρωμής',
   blockchain_hash: 'Blockchain hash',
+
+  // Guide Profile Enhanced
+  profile_photo: 'Φωτογραφία Προφίλ',
+  change: 'Αλλαγή',
+  upload_photo: 'Ανέβασε Φωτογραφία',
+  uploading: 'Ανέβασμα…',
+  photo_hint: 'JPG, PNG ή WebP. Μέγιστο 10MB.',
+  basic_info: 'Βασικές Πληροφορίες',
+  location_service_areas: 'Τοποθεσία & Περιοχές Εξυπηρέτησης',
+  service_areas_desc: 'Επίλεξε την κύρια πόλη σου και τις πόλεις/περιοχές όπου προσφέρεις υπηρεσίες.',
+  primary_city: 'Κύρια Πόλη',
+  select_city: 'Επίλεξε πόλη…',
+  service_cities: 'Πόλεις Εξυπηρέτησης',
+  cities_selected: 'πόλεις επιλεγμένες',
+  description: 'Περιγραφή',
+  share: 'Κοινοποίηση',
+  link_copied: 'Ο σύνδεσμος αντιγράφηκε!',
+
+  // Verification Enhanced
+  verification_steps_title: 'Απαιτείται Επαλήθευση Εγγράφων',
+  verification_steps_desc: 'Ανεβάστε την ταυτότητά σας και μια selfie για να επαληθεύσετε την ταυτότητά σας. Αν είστε αδειοδοτημένος ξεναγός, ανεβάστε και την άδεια ξεναγού.',
+  upload_id_document: 'Κρατική Ταυτότητα',
+  upload_id_desc: 'Ανεβάστε μια καθαρή φωτογραφία ή σκαν της κρατικής ταυτότητάς σας (διαβατήριο, ταυτότητα ή δίπλωμα οδήγησης).',
+  upload_selfie: 'Selfie Φωτογραφία',
+  upload_selfie_desc: 'Τραβήξτε μια καθαρή selfie κρατώντας την ταυτότητά σας δίπλα στο πρόσωπό σας.',
+  upload_guide_license: 'Άδεια Ξεναγού',
+  upload_license_desc: 'Αν διαθέτετε επίσημη άδεια ξεναγού, ανεβάστε την εδώ για προτεραιότητα στην επαλήθευση.',
+  document_uploaded: 'Έγγραφο ανέβηκε',
+  selfie_uploaded: 'Selfie ανέβηκε',
+  license_uploaded: 'Άδεια ανέβηκε',
+  click_to_upload_id: 'Κλικ για ανέβασμα ταυτότητας',
+  click_to_upload_selfie: 'Κλικ για ανέβασμα selfie',
+  click_to_upload_license: 'Κλικ για ανέβασμα άδειας ξεναγού',
+  optional: 'Προαιρετικό',
+  upload_failed: 'Το ανέβασμα απέτυχε. Δοκιμάστε ξανά.',
+  id_and_selfie_required: 'Η ταυτότητα και η selfie είναι υποχρεωτικές.',
+  powered_by_verifyid: 'Powered by ThronosChain VerifyID',
+  verifyid_desc: 'Τα έγγραφά σας ελέγχονται από το σύστημα ανίχνευσης απάτης AI και επαληθεύονται μέσω ThronosChain VerifyID. Αν ο agent VerifyID δεν είναι διαθέσιμος, η υποβολή σας θα σταλεί στον manager επαλήθευσης για χειροκίνητο έλεγχο.',
+  fraud_score: 'Βαθμός εμπιστοσύνης',
+
+  // Experiences Enhanced
+  create_experience: 'Δημιουργία Εμπειρίας',
+  create_new_experience: 'Νέα Εμπειρία',
+  experience_photo: 'Φωτογραφία Εμπειρίας',
+  create_first_experience: 'Κλικ στο "Δημιουργία Εμπειρίας" για να ξεκινήσεις.',
+  verification_required_title: 'Απαιτείται Επαλήθευση',
+  verification_required_desc: 'Πρέπει να ολοκληρώσεις την επαλήθευση ταυτότητας πριν δημιουργήσεις εμπειρίες. Πήγαινε στη σελίδα Επαλήθευσης.',
+
+  // Debit Card
+  your_name: 'ΤΟ ΟΝΟΜΑ ΣΟΥ',
+  get_debit_card: 'Απόκτησε τη Χρεωστική σου Κάρτα',
+  debit_card_desc: 'Ξόδεψε τα κέρδη σου άμεσα με μια crypto χρεωστική κάρτα. Χωρίς τράπεζα.',
+  get_your_card: 'Πάρε την Κάρτα σου',
+
+  // Admin Verification Enhanced
+  submitted_documents: 'Υποβληθέντα Έγγραφα',
+  no_document: 'Κανένα έγγραφο',
+  not_provided: 'Δεν παρέχεται',
 }
 
 export default el

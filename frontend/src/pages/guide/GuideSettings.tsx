@@ -17,6 +17,7 @@ export default function GuideSettings() {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
+  const [etherfiUrl, setEtherfiUrl] = useState('https://app.ether.fi/card')
 
   useEffect(() => {
     api.get<GuideDetail>('/api/v1/guide/me').then((data) => {
@@ -24,6 +25,9 @@ export default function GuideSettings() {
       setPaymentMethod(data.payment_method || '')
       setStripeAccountId(data.stripe_account_id || '')
       setCryptoWallet(data.crypto_wallet_address || '')
+    }).catch(() => {})
+    api.get<{ etherfi_referral_url?: string }>('/api/v1/public/config').then((cfg) => {
+      if (cfg.etherfi_referral_url) setEtherfiUrl(cfg.etherfi_referral_url)
     }).catch(() => {})
   }, [])
 
@@ -168,6 +172,57 @@ export default function GuideSettings() {
           >
             {saving ? t('saving') : t('save_changes')}
           </button>
+        </div>
+
+        {/* Debit Card – Powered by ThronosChain & Ether.fi */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-indigo-900 p-6 text-white shadow-xl">
+          {/* Background pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-4 right-4 w-64 h-40 rounded-xl border-2 border-white/30 rotate-6" />
+            <div className="absolute top-6 right-8 w-64 h-40 rounded-xl border border-white/20 rotate-3" />
+          </div>
+
+          <div className="relative flex flex-col sm:flex-row items-start sm:items-center gap-5">
+            {/* Card visual */}
+            <div className="flex-shrink-0 w-56 h-36 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-4 flex flex-col justify-between shadow-lg transform hover:scale-105 transition-transform">
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-7 rounded bg-yellow-300/80" />
+                <span className="text-xs font-mono opacity-80">VISA</span>
+              </div>
+              <div>
+                <div className="text-xs font-mono tracking-widest opacity-70 mb-1">**** **** **** ****</div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] uppercase tracking-wider opacity-60">{t('your_name')}</span>
+                  <span className="text-[10px] opacity-60">XX/XX</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Text content */}
+            <div className="flex-1 min-w-0">
+              <h3 className="text-lg font-bold mb-1">{t('get_debit_card')}</h3>
+              <p className="text-sm text-gray-300 mb-3 leading-relaxed">
+                {t('debit_card_desc')}
+              </p>
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/10 text-gray-300 font-medium">Powered by</span>
+                <span className="text-sm font-bold tracking-tight">ThronosChain</span>
+                <span className="text-gray-500">&</span>
+                <span className="text-sm font-bold tracking-tight text-indigo-300">Ether.fi</span>
+              </div>
+              <a
+                href={etherfiUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:from-indigo-600 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl"
+              >
+                {t('get_your_card')}
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+            </div>
+          </div>
         </div>
 
         {/* Notifications placeholder */}

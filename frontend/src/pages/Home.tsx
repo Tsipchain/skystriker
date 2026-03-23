@@ -13,6 +13,20 @@ export default function Home() {
   const [guides, setGuides] = useState<GuideCard[]>([])
   const [experiences, setExperiences] = useState<ExperienceCard[]>([])
   const [loading, setLoading] = useState(true)
+  const [shareMsg, setShareMsg] = useState('')
+
+  function handleShare() {
+    const url = window.location.origin
+    const text = 'Discover verified local guides & authentic destination experiences on SkyStriker!'
+    if (navigator.share) {
+      navigator.share({ title: 'SkyStriker Global Guides', text, url }).catch(() => {})
+    } else {
+      navigator.clipboard.writeText(`${text} ${url}`).then(() => {
+        setShareMsg(t('link_copied'))
+        setTimeout(() => setShareMsg(''), 3000)
+      }).catch(() => {})
+    }
+  }
 
   useEffect(() => {
     Promise.all([
@@ -45,14 +59,26 @@ export default function Home() {
           <p className="text-sky-100 text-lg md:text-xl max-w-2xl mx-auto mb-8">
             {t('hero_desc')}
           </p>
-          <div className="flex justify-center gap-4">
+          <div className="flex flex-wrap justify-center gap-4">
             <Link to="/experiences" className="bg-white text-sky-700 font-bold px-6 py-3 rounded-lg hover:bg-sky-50 transition-colors shadow-lg">
               {t('browse_experiences')}
             </Link>
             <Link to="/verification" className="border-2 border-white/40 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/10 transition-colors">
               {t('how_verification_works')}
             </Link>
+            <button
+              onClick={handleShare}
+              className="border-2 border-white/40 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/10 transition-colors flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+              </svg>
+              {t('share')}
+            </button>
           </div>
+          {shareMsg && (
+            <p className="text-sm text-amber-300 mt-3 animate-pulse">{shareMsg}</p>
+          )}
         </div>
       </section>
 
