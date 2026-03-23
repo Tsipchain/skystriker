@@ -19,6 +19,7 @@ from typing import Optional
 from sqlalchemy import (
     Boolean,
     Column,
+    Date,
     DateTime,
     Enum,
     Float,
@@ -26,6 +27,7 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
 
@@ -77,6 +79,17 @@ class BookingStatus(str, enum.Enum):
     declined = "declined"
 
 
+class UserRole(str, enum.Enum):
+    guest = "guest"
+    guide = "guide"
+    admin = "admin"
+
+
+class AuthProvider(str, enum.Enum):
+    email = "email"
+    google = "google"
+
+
 class AuditAction(str, enum.Enum):
     guide_registered = "guide_registered"
     verification_submitted = "verification_submitted"
@@ -93,6 +106,29 @@ class AuditAction(str, enum.Enum):
     review_submitted = "review_submitted"
     review_flagged = "review_flagged"
     admin_action = "admin_action"
+    user_registered = "user_registered"
+
+
+# ---------------------------------------------------------------------------
+# User (authentication)
+# ---------------------------------------------------------------------------
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(String(36), primary_key=True, default=_uuid)
+    email = Column(String(254), unique=True, nullable=False, index=True)
+    full_name = Column(String(200), nullable=False)
+    avatar_url = Column(Text, default="")
+    password_hash = Column(String(255), default="")   # empty for Google-only users
+    auth_provider = Column(Enum(AuthProvider), default=AuthProvider.email, nullable=False)
+    google_sub = Column(String(255), default="", index=True)  # Google subject ID
+    role = Column(Enum(UserRole), default=UserRole.guest, nullable=False)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=_utcnow, nullable=False)
+    updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow, nullable=False)
+
+    guide = relationship("Guide", back_populates="user", uselist=False)
 
 
 # ---------------------------------------------------------------------------
@@ -140,6 +176,7 @@ class Guide(Base):
     __tablename__ = "guides"
 
     id = Column(String(36), primary_key=True, default=_uuid)
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=True, unique=True)
     full_name = Column(String(200), nullable=False)
     email = Column(String(254), unique=True, nullable=False, index=True)
     phone = Column(String(40), default="")
@@ -158,10 +195,12 @@ class Guide(Base):
     created_at = Column(DateTime, default=_utcnow, nullable=False)
     updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow, nullable=False)
 
+    user = relationship("User", back_populates="guide")
     city = relationship("City", back_populates="guides")
     experiences = relationship("Experience", back_populates="guide", cascade="all, delete-orphan")
     bookings = relationship("Booking", back_populates="guide", cascade="all, delete-orphan")
     reviews = relationship("Review", back_populates="guide", cascade="all, delete-orphan")
+    availability_slots = relationship("GuideAvailability", back_populates="guide", cascade="all, delete-orphan")
 
 
 # ---------------------------------------------------------------------------
@@ -245,6 +284,33 @@ class Review(Base):
     experience = relationship("Experience", back_populates="reviews")
     guide = relationship("Guide", back_populates="reviews")
     booking = relationship("Booking")
+
+
+# ---------------------------------------------------------------------------
+# Audit log
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# Guide Availability
+# ---------------------------------------------------------------------------
+
+class GuideAvailability(Base):
+    __tablename__ = "guide_availability"
+    __table_args__ = (
+        UniqueConstraint("guide_id", "date", name="uq_guide_date"),
+    )
+
+    id = Column(String(36), primary_key=True, default=_uuid)
+    guide_id = Column(String(36), ForeignKey("guides.id"), nullable=False)
+    date = Column(Date, nullable=False, index=True)
+    start_time = Column(String(5), default="09:00")   # HH:MM
+    end_time = Column(String(5), default="18:00")      # HH:MM
+    max_bookings = Column(Integer, default=3)
+    note = Column(Text, default="")
+    is_available = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=_utcnow, nullable=False)
+
+    guide = relationship("Guide", back_populates="availability_slots")
 
 
 # ---------------------------------------------------------------------------

@@ -1,8 +1,4 @@
-"""Lightweight auth helpers.
-
-The platform currently uses a simple demo-token scheme.  A production
-deployment would replace this with proper JWT / OAuth.
-"""
+"""Auth helpers – supports JWT tokens and legacy X-Guide-Id header."""
 
 import logging
 
@@ -11,45 +7,70 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from dependencies.database import get_db
-from models.platform import Guide
+from models.platform import Guide, User
+from services.auth import decode_token
 
 logger = logging.getLogger(__name__)
 
 
 def get_current_guide(
+    authorization: str = Header(default=""),
     x_guide_id: str = Header(default=""),
     db: Session = Depends(get_db),
 ) -> Guide:
-    """Return the guide identified by the ``X-Guide-Id`` header.
+    """Return the guide for the current session.
 
-    In production this would decode a JWT.  For the initial launch the
-    header-based approach lets the frontend switch roles instantly.
+    Supports:
+    1. JWT Bearer token (Authorization header) → resolve user → guide
+    2. Legacy X-Guide-Id header (for demo/RoleSwitcher)
     """
-    if not x_guide_id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Missing X-Guide-Id header",
-        )
-    result = db.execute(select(Guide).where(Guide.id == x_guide_id))
-    guide = result.scalar_one_or_none()
-    if not guide:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Guide not found",
-        )
-    return guide
+    # Try JWT first
+    if authorization.startswith("Bearer "):
+        token = authorization[7:]
+        payload = decode_token(token)
+        if payload:
+            user = db.execute(
+                select(User).where(User.id == payload["sub"])
+            ).scalar_one_or_none()
+            if user:
+                guide = db.execute(
+                    select(Guide).where(Guide.user_id == user.id)
+                ).scalar_one_or_none()
+                if guide:
+                    return guide
+
+    # Fallback to X-Guide-Id header
+    if x_guide_id:
+        guide = db.execute(
+            select(Guide).where(Guide.id == x_guide_id)
+        ).scalar_one_or_none()
+        if guide:
+            return guide
+
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Authentication required – log in or select a guide",
+    )
 
 
 def require_admin(
+    authorization: str = Header(default=""),
     x_admin_token: str = Header(default=""),
+    db: Session = Depends(get_db),
 ) -> bool:
-    """Very simple admin gate – expects a static token.
+    """Admin gate – supports JWT (role=admin) or legacy static token."""
+    # Try JWT
+    if authorization.startswith("Bearer "):
+        token = authorization[7:]
+        payload = decode_token(token)
+        if payload and payload.get("role") == "admin":
+            return True
 
-    Replace with real RBAC before going to production.
-    """
-    if x_admin_token != "skystriker-admin":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admin access required",
-        )
-    return True
+    # Legacy token
+    if x_admin_token == "skystriker-admin":
+        return True
+
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Admin access required",
+    )

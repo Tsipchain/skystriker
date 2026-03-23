@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import api from '../api/client'
 import LoadingBlock from '../components/LoadingBlock'
+import BookingCalendar from '../components/BookingCalendar'
 import type { ExperienceCard, Booking } from '../types'
 
 export default function ExperienceDetail() {
@@ -107,6 +108,20 @@ export default function ExperienceDetail() {
             <span className="font-medium text-gray-700">Languages:</span> {exp.languages.join(', ')}
           </p>
         )}
+      </div>
+
+      {/* Booking calendar */}
+      <div className="mb-8">
+        <BookingCalendar
+          guideId={exp.guide_id}
+          selectedDate={requestedDate}
+          onSelectDate={(date, timeRange) => {
+            setRequestedDate(date)
+            if (!requestedTime) {
+              setRequestedTime(timeRange.split('–')[0] || '10:00')
+            }
+          }}
+        />
       </div>
 
       {/* Booking form */}

@@ -131,3 +131,39 @@ export interface HealthResponse {
   version: string
   environment: string
 }
+
+/* Auth */
+export interface AuthUser {
+  id: string
+  email: string
+  full_name: string
+  avatar_url: string
+  role: string
+  auth_provider: string
+  guide_id: string | null
+}
+
+export interface AuthResponse {
+  token: string
+  user: AuthUser
+}
+
+/* Availability */
+export interface AvailabilitySlot {
+  id: string
+  guide_id: string
+  date: string
+  start_time: string
+  end_time: string
+  max_bookings: number
+  note: string
+  is_available: boolean
+}
+
+export interface CalendarDay {
+  date: string
+  is_available: boolean
+  start_time: string
+  end_time: string
+  spots_left: number
+}

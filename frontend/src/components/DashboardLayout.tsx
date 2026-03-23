@@ -1,4 +1,5 @@
-import { Link, Outlet, useLocation } from 'react-router-dom'
+import { Link, Outlet, useLocation, Navigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import RoleSwitcher from './RoleSwitcher'
 
 const SIDEBAR = [
@@ -14,6 +15,13 @@ const SIDEBAR = [
 
 export default function DashboardLayout() {
   const { pathname } = useLocation()
+  const { user, logout } = useAuth()
+
+  // If not logged in and no demo guide selected, redirect to auth
+  const hasGuideId = !!localStorage.getItem('skystriker_guide_id')
+  if (!user && !hasGuideId) {
+    return <Navigate to="/auth" />
+  }
 
   return (
     <div className="min-h-screen flex bg-gray-50">
@@ -39,8 +47,32 @@ export default function DashboardLayout() {
             </Link>
           ))}
         </nav>
-        <div className="p-4 border-t border-gray-100">
-          <RoleSwitcher />
+        <div className="p-4 border-t border-gray-100 space-y-3">
+          {user ? (
+            <div className="flex items-center gap-2">
+              {user.avatar_url ? (
+                <img src={user.avatar_url} alt="" className="w-8 h-8 rounded-full" />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center text-xs font-bold">
+                  {user.full_name.charAt(0).toUpperCase()}
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">{user.full_name}</p>
+                <p className="text-xs text-gray-400 truncate">{user.email}</p>
+              </div>
+            </div>
+          ) : (
+            <RoleSwitcher />
+          )}
+          {user && (
+            <button
+              onClick={() => { logout(); window.location.href = '/' }}
+              className="w-full text-xs text-gray-400 hover:text-gray-600 py-1"
+            >
+              Log out
+            </button>
+          )}
         </div>
       </aside>
 
@@ -48,7 +80,9 @@ export default function DashboardLayout() {
       <div className="flex-1 flex flex-col min-w-0">
         <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 lg:px-8 sticky top-0 z-20">
           <h1 className="text-lg font-semibold text-gray-900">Guide Dashboard</h1>
-          <Link to="/" className="text-sm text-sky-600 hover:underline">Back to site</Link>
+          <div className="flex items-center gap-4">
+            <Link to="/" className="text-sm text-sky-600 hover:underline">Back to site</Link>
+          </div>
         </header>
         <main className="flex-1 p-6 lg:p-8 overflow-auto">
           <Outlet />

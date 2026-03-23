@@ -1,4 +1,5 @@
-import { Link, Outlet, useLocation } from 'react-router-dom'
+import { Link, Outlet, useLocation, Navigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
 const SIDEBAR = [
   { to: '/admin', label: 'Guides', icon: '👥' },
@@ -10,6 +11,13 @@ const SIDEBAR = [
 
 export default function AdminLayout() {
   const { pathname } = useLocation()
+  const { user, logout } = useAuth()
+
+  // Allow access if user is admin OR has legacy admin token
+  const hasAdminToken = !!localStorage.getItem('skystriker_admin_token')
+  if (!user?.role && user?.role !== 'admin' && !hasAdminToken) {
+    return <Navigate to="/auth" />
+  }
 
   return (
     <div className="min-h-screen flex bg-gray-50">
@@ -34,8 +42,24 @@ export default function AdminLayout() {
             </Link>
           ))}
         </nav>
-        <div className="p-4 border-t border-gray-800 text-xs text-gray-500">
-          <Link to="/" className="hover:text-gray-300">Back to site</Link>
+        <div className="p-4 border-t border-gray-800">
+          {user && (
+            <div className="mb-2">
+              <p className="text-xs text-gray-400 truncate">{user.full_name}</p>
+              <p className="text-xs text-gray-500 truncate">{user.email}</p>
+            </div>
+          )}
+          <div className="flex items-center justify-between text-xs text-gray-500">
+            <Link to="/" className="hover:text-gray-300">Back to site</Link>
+            {user && (
+              <button
+                onClick={() => { logout(); window.location.href = '/' }}
+                className="hover:text-gray-300"
+              >
+                Logout
+              </button>
+            )}
+          </div>
         </div>
       </aside>
 

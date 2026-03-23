@@ -15,6 +15,7 @@ interface RequestOptions {
 async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
   const { method = 'GET', body, headers = {} } = opts
 
+  const token = localStorage.getItem('skystriker_token') || ''
   const guideId = localStorage.getItem('skystriker_guide_id') || ''
   const adminToken = localStorage.getItem('skystriker_admin_token') || ''
 
@@ -22,6 +23,7 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
     method,
     headers: {
       'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(guideId ? { 'X-Guide-Id': guideId } : {}),
       ...(adminToken ? { 'X-Admin-Token': adminToken } : {}),
       ...headers,

@@ -1,4 +1,5 @@
-import { Link, Outlet, useLocation } from 'react-router-dom'
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
 const NAV_LINKS = [
   { to: '/', label: 'Home' },
@@ -10,6 +11,8 @@ const NAV_LINKS = [
 
 export default function PublicLayout() {
   const { pathname } = useLocation()
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -37,8 +40,53 @@ export default function PublicLayout() {
           </nav>
 
           <div className="flex items-center gap-2">
-            <Link to="/guide" className="btn-ghost text-sm">Guide Dashboard</Link>
-            <Link to="/admin" className="btn-ghost text-sm">Admin</Link>
+            {user ? (
+              <>
+                {user.role === 'guide' && (
+                  <Link to="/guide" className="text-sm font-medium text-sky-600 hover:text-sky-700 px-3 py-2">
+                    Dashboard
+                  </Link>
+                )}
+                {user.role === 'admin' && (
+                  <Link to="/admin" className="text-sm font-medium text-purple-600 hover:text-purple-700 px-3 py-2">
+                    Admin
+                  </Link>
+                )}
+                <div className="flex items-center gap-2 pl-2 border-l border-gray-200">
+                  {user.avatar_url ? (
+                    <img src={user.avatar_url} alt="" className="w-7 h-7 rounded-full" />
+                  ) : (
+                    <div className="w-7 h-7 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center text-xs font-bold">
+                      {user.full_name.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  <span className="text-sm font-medium text-gray-700 hidden sm:block">
+                    {user.full_name.split(' ')[0]}
+                  </span>
+                  <button
+                    onClick={() => { logout(); navigate('/') }}
+                    className="text-xs text-gray-400 hover:text-gray-600 ml-1"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/auth"
+                  className="text-sm font-medium text-gray-600 hover:text-gray-900 px-3 py-2"
+                >
+                  Log In
+                </Link>
+                <Link
+                  to="/auth"
+                  className="text-sm font-medium bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-colors"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -70,7 +118,6 @@ export default function PublicLayout() {
               <ul className="space-y-1">
                 <li><Link to="/verification" className="hover:text-white">Verification</Link></li>
                 <li><Link to="/guide" className="hover:text-white">Guide Dashboard</Link></li>
-                <li><Link to="/admin" className="hover:text-white">Admin Panel</Link></li>
               </ul>
             </div>
           </div>

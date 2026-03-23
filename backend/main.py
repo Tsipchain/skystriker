@@ -62,14 +62,18 @@ setup_cors(app)
 
 # --- routers ---
 from routers.health import router as health_router  # noqa: E402
+from routers.auth import router as auth_router  # noqa: E402
 from routers.public import router as public_router  # noqa: E402
 from routers.guide import router as guide_router  # noqa: E402
 from routers.admin import router as admin_router  # noqa: E402
+from routers.availability import router as availability_router  # noqa: E402
 
 app.include_router(health_router)
+app.include_router(auth_router)
 app.include_router(public_router)
 app.include_router(guide_router)
 app.include_router(admin_router)
+app.include_router(availability_router)
 
 
 # ---------------------------------------------------------------------------
