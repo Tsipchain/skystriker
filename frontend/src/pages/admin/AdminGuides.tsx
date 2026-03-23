@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import api from '../../api/client'
 import LoadingBlock from '../../components/LoadingBlock'
+import { useLang } from '../../context/LanguageContext'
 import type { GuideCard } from '../../types'
 
 export default function AdminGuides() {
+  const { t } = useLang()
   const [guides, setGuides] = useState<GuideCard[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -18,17 +20,17 @@ export default function AdminGuides() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">All Guides</h2>
+      <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('all_guides')}</h2>
 
       <div className="card overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-left">
             <tr>
-              <th className="px-4 py-3 font-semibold text-gray-600">Name</th>
-              <th className="px-4 py-3 font-semibold text-gray-600">City</th>
-              <th className="px-4 py-3 font-semibold text-gray-600">Status</th>
-              <th className="px-4 py-3 font-semibold text-gray-600">Rating</th>
-              <th className="px-4 py-3 font-semibold text-gray-600">Reviews</th>
+              <th className="px-4 py-3 font-semibold text-gray-600">{t('name')}</th>
+              <th className="px-4 py-3 font-semibold text-gray-600">{t('city')}</th>
+              <th className="px-4 py-3 font-semibold text-gray-600">{t('status')}</th>
+              <th className="px-4 py-3 font-semibold text-gray-600">{t('rating')}</th>
+              <th className="px-4 py-3 font-semibold text-gray-600">{t('reviews')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -63,7 +65,7 @@ export default function AdminGuides() {
       </div>
 
       {guides.length === 0 && (
-        <p className="text-gray-400 text-center py-12">No guides found.</p>
+        <p className="text-gray-400 text-center py-12">{t('no_guides')}</p>
       )}
     </div>
   )

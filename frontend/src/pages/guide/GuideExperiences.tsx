@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import api from '../../api/client'
 import LoadingBlock from '../../components/LoadingBlock'
+import { useLang } from '../../context/LanguageContext'
 import type { ExperienceCard } from '../../types'
 
 export default function GuideExperiences() {
+  const { t } = useLang()
   const [experiences, setExperiences] = useState<ExperienceCard[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -15,7 +17,7 @@ export default function GuideExperiences() {
   }, [])
 
   async function handleDelete(id: string) {
-    if (!confirm('Delete this experience?')) return
+    if (!confirm(t('delete_experience_confirm'))) return
     try {
       await api.delete(`/api/v1/guide/experiences/${id}`)
       setExperiences((prev) => prev.filter((e) => e.id !== id))
@@ -29,12 +31,12 @@ export default function GuideExperiences() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">My Experiences</h2>
+        <h2 className="text-2xl font-bold text-gray-900">{t('my_experiences')}</h2>
       </div>
 
       {experiences.length === 0 ? (
         <div className="card p-12 text-center text-gray-400">
-          <p>You haven't created any experiences yet.</p>
+          <p>{t('no_experiences_yet')}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -47,15 +49,15 @@ export default function GuideExperiences() {
                 <div>
                   <h3 className="font-semibold text-gray-900">{e.title}</h3>
                   <p className="text-sm text-gray-500">
-                    {e.city_name} · {e.duration_minutes} min · {e.currency} {e.price}
+                    {e.city_name} · {e.duration_minutes} {t('min')} · {e.currency} {e.price}
                   </p>
                   <p className="text-sm text-gray-400 mt-1">
-                    {e.avg_rating.toFixed(1)} rating · {e.total_bookings} bookings
+                    {e.avg_rating.toFixed(1)} {t('rating')} · {e.total_bookings} {t('bookings')}
                   </p>
                 </div>
               </div>
               <button onClick={() => handleDelete(e.id)} className="text-red-500 hover:text-red-700 text-sm font-medium">
-                Delete
+                {t('delete')}
               </button>
             </div>
           ))}

@@ -291,6 +291,34 @@ const tr = {
   history: 'Geçmiş',
   no_translations_yet: 'Henüz çeviri yok.',
   speech_not_supported: 'Bu tarayıcıda konuşma tanıma desteklenmiyor',
+
+  // City Detail
+  city_not_found: 'Şehir bulunamadı.',
+  guides_in_city: '{name} rehberleri',
+  verified_local_guides_count: '{count} doğrulanmış yerel rehber',
+  experiences_in_city: '{name} deneyimleri',
+  activities_to_choose: '{count} seçilebilir aktivite',
+
+  // Verification Explainer
+  verify_how_title: 'VerifyID Doğrulama Nasıl Çalışır',
+  verify_how_desc: 'SkyStriker\'daki her rehber, şu teknoloji tarafından desteklenen doğrulama sürecimizden geçer:',
+  verify_how_confidence: 'Bu, gezginlerin tam bir güvenle rezervasyon yapabilmesini sağlar.',
+  verify_step1_title: 'Kimlik Gönder',
+  verify_step1_desc: 'Güvenli SkyStriker Rehber Paneli üzerinden devlet tarafından verilmiş fotoğraflı kimliğinizi yükleyin. Belgeleriniz uçtan uca şifrelenir ve doğrulama sonrasında sunucularımızda saklanmaz.',
+  verify_step2_title: 'Thronos Chain Tarafından İnceleme',
+  verify_step2_desc: 'Kimliğiniz, güvenilir merkeziyetsiz doğrulama ortağımız Thronos Chain VerifyID aracılığıyla doğrulanır. İnceleme, belge özgünlüğünü kontrol eder ve profil bilgilerinizle eşleştirir.',
+  verify_step3_title: 'Doğrulanmış Rozet',
+  verify_step3_desc: 'Onaylandıktan sonra profilinizde tüm gezginlere görünür yeşil bir "Doğrulanmış" rozeti görüntülenir. Bu rozet, kimlik kontrolünden geçtiğinizi gösterir, güven oluşturur ve rezervasyonlarınızı artırır.',
+  verify_ready_title: 'Doğrulanmış rehber olmaya hazır mısınız?',
+  verify_ready_desc: 'Dünya genelinde gezginlerle otantik deneyimlerini paylaşan yüzlerce doğrulanmış yerel rehbere katılın.',
+  verify_open_dashboard: 'Rehber Panelini Aç',
+
+  // Booking
+  no_bookings_yet: 'Henüz rezervasyon yok.',
+  mark_complete: 'Tamamlandı Olarak İşaretle',
+  no_experiences_found: 'Deneyim bulunamadı.',
+  guest: 'misafir',
+  guests_plural: 'misafir',
 }
 
 export default tr

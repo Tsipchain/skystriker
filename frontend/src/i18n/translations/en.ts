@@ -291,6 +291,34 @@ const en = {
   history: 'History',
   no_translations_yet: 'No translations yet.',
   speech_not_supported: 'Speech recognition not supported in this browser',
+
+  // City Detail
+  city_not_found: 'City not found.',
+  guides_in_city: 'Guides in {name}',
+  verified_local_guides_count: '{count} verified local guides',
+  experiences_in_city: 'Experiences in {name}',
+  activities_to_choose: '{count} activities to choose from',
+
+  // Verification Explainer
+  verify_how_title: 'How VerifyID Verification Works',
+  verify_how_desc: 'Every guide on SkyStriker goes through our verification process powered by',
+  verify_how_confidence: 'This ensures travellers can book with complete confidence.',
+  verify_step1_title: 'Submit ID',
+  verify_step1_desc: 'Upload a government-issued photo ID through the secure SkyStriker Guide Dashboard. Your documents are encrypted end-to-end and never stored on our servers after verification.',
+  verify_step2_title: 'Review by Thronos Chain',
+  verify_step2_desc: 'Your identity is verified through Thronos Chain VerifyID, our trusted decentralised verification partner. The review checks document authenticity and matches your profile information.',
+  verify_step3_title: 'Verified Badge',
+  verify_step3_desc: 'Once approved, your profile displays a green "Verified" badge visible to all travellers. This badge signals that you have been identity-checked, building trust and boosting your bookings.',
+  verify_ready_title: 'Ready to become a verified guide?',
+  verify_ready_desc: 'Join hundreds of verified locals sharing authentic experiences with travellers worldwide.',
+  verify_open_dashboard: 'Open Guide Dashboard',
+
+  // Booking
+  no_bookings_yet: 'No bookings yet.',
+  mark_complete: 'Mark Complete',
+  no_experiences_found: 'No experiences found.',
+  guest: 'guest',
+  guests_plural: 'guests',
 }
 
 export default en

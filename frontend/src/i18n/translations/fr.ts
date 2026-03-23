@@ -291,6 +291,34 @@ const fr = {
   history: 'Historique',
   no_translations_yet: 'Aucune traduction pour le moment.',
   speech_not_supported: 'La reconnaissance vocale n\'est pas prise en charge dans ce navigateur',
+
+  // City Detail
+  city_not_found: 'Ville non trouvée.',
+  guides_in_city: 'Guides à {name}',
+  verified_local_guides_count: '{count} guides locaux vérifiés',
+  experiences_in_city: 'Expériences à {name}',
+  activities_to_choose: '{count} activités au choix',
+
+  // Verification Explainer
+  verify_how_title: 'Comment fonctionne la vérification VerifyID',
+  verify_how_desc: 'Chaque guide sur SkyStriker passe par notre processus de vérification propulsé par',
+  verify_how_confidence: 'Cela garantit que les voyageurs peuvent réserver en toute confiance.',
+  verify_step1_title: 'Soumettre une pièce d\'identité',
+  verify_step1_desc: 'Téléchargez une pièce d\'identité avec photo délivrée par le gouvernement via le tableau de bord sécurisé SkyStriker Guide. Vos documents sont chiffrés de bout en bout et ne sont jamais stockés sur nos serveurs après la vérification.',
+  verify_step2_title: 'Examen par Thronos Chain',
+  verify_step2_desc: 'Votre identité est vérifiée par Thronos Chain VerifyID, notre partenaire de vérification décentralisée de confiance. L\'examen vérifie l\'authenticité du document et la correspondance avec les informations de votre profil.',
+  verify_step3_title: 'Badge Vérifié',
+  verify_step3_desc: 'Une fois approuvé, votre profil affiche un badge vert « Vérifié » visible par tous les voyageurs. Ce badge indique que votre identité a été vérifiée, renforçant la confiance et augmentant vos réservations.',
+  verify_ready_title: 'Prêt à devenir un guide vérifié ?',
+  verify_ready_desc: 'Rejoignez des centaines de locaux vérifiés qui partagent des expériences authentiques avec des voyageurs du monde entier.',
+  verify_open_dashboard: 'Ouvrir le tableau de bord Guide',
+
+  // Booking
+  no_bookings_yet: 'Aucune réservation pour le moment.',
+  mark_complete: 'Marquer comme terminé',
+  no_experiences_found: 'Aucune expérience trouvée.',
+  guest: 'invité',
+  guests_plural: 'invités',
 }
 
 export default fr

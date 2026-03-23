@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import api from '../../api/client'
 import LoadingBlock from '../../components/LoadingBlock'
+import { useLang } from '../../context/LanguageContext'
 import type { GuideCard } from '../../types'
 
 export default function AdminVerifications() {
+  const { t } = useLang()
   const [guides, setGuides] = useState<GuideCard[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -27,11 +29,11 @@ export default function AdminVerifications() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Pending Verifications</h2>
+      <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('pending_verifications')}</h2>
 
       {guides.length === 0 ? (
         <div className="card p-12 text-center text-gray-400">
-          No pending verification requests.
+          {t('no_pending_verifications')}
         </div>
       ) : (
         <div className="space-y-4">
@@ -51,10 +53,10 @@ export default function AdminVerifications() {
               </div>
               <div className="flex gap-2">
                 <button onClick={() => handleAction(g.id, 'verify')} className="btn-primary py-1.5 px-4 text-sm">
-                  Approve
+                  {t('approve')}
                 </button>
                 <button onClick={() => handleAction(g.id, 'reject')} className="btn-secondary py-1.5 px-4 text-sm">
-                  Reject
+                  {t('reject')}
                 </button>
               </div>
             </div>

@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import api from '../../api/client'
+import { useLang } from '../../context/LanguageContext'
 import type { AvailabilitySlot } from '../../types'
-
-const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
 function getMonthDays(year: number, month: number) {
   const firstDay = new Date(year, month, 1)
@@ -24,12 +23,8 @@ function fmt(d: Date) {
   return d.toISOString().slice(0, 10)
 }
 
-const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
-]
-
 export default function GuideAvailability() {
+  const { t } = useLang()
   const today = new Date()
   const [year, setYear] = useState(today.getFullYear())
   const [month, setMonth] = useState(today.getMonth())
@@ -40,6 +35,12 @@ export default function GuideAvailability() {
   const [maxBookings, setMaxBookings] = useState(3)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
+
+  const MONTH_NAMES = [
+    t('month_jan'), t('month_feb'), t('month_mar'), t('month_apr'), t('month_may'), t('month_jun'),
+    t('month_jul'), t('month_aug'), t('month_sep'), t('month_oct'), t('month_nov'), t('month_dec'),
+  ]
+  const DAYS = [t('day_mon'), t('day_tue'), t('day_wed'), t('day_thu'), t('day_fri'), t('day_sat'), t('day_sun')]
 
   const monthStr = `${year}-${String(month + 1).padStart(2, '0')}`
 
@@ -78,10 +79,10 @@ export default function GuideAvailability() {
       result.forEach((s) => newMap.set(s.date, s))
       setSlots(Array.from(newMap.values()))
       setSelected(new Set())
-      setMessage(`${result.length} date(s) saved!`)
+      setMessage(t('dates_saved', { count: result.length }))
       setTimeout(() => setMessage(''), 3000)
     } catch (err) {
-      setMessage('Failed to save')
+      setMessage(t('failed_save'))
     } finally {
       setSaving(false)
     }
@@ -107,9 +108,9 @@ export default function GuideAvailability() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-2">Availability</h2>
+      <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('availability')}</h2>
       <p className="text-gray-500 text-sm mb-6">
-        Select dates you're available, then save. Customers will see these on your booking calendar.
+        {t('availability_desc')}
       </p>
 
       <div className="grid lg:grid-cols-3 gap-6">
@@ -175,13 +176,13 @@ export default function GuideAvailability() {
 
           <div className="flex items-center gap-4 mt-4 text-xs text-gray-500">
             <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded bg-emerald-100 border border-emerald-300" /> Available
+              <span className="w-3 h-3 rounded bg-emerald-100 border border-emerald-300" /> {t('available')}
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded bg-sky-100 border border-sky-400" /> Selected
+              <span className="w-3 h-3 rounded bg-sky-100 border border-sky-400" /> {t('selected')}
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded bg-gray-50 border border-gray-200" /> Unavailable
+              <span className="w-3 h-3 rounded bg-gray-50 border border-gray-200" /> {t('unavailable')}
             </span>
           </div>
         </div>
@@ -189,10 +190,10 @@ export default function GuideAvailability() {
         {/* Settings panel */}
         <div className="space-y-4">
           <div className="card p-6">
-            <h3 className="font-semibold text-gray-900 mb-4">Time Settings</h3>
+            <h3 className="font-semibold text-gray-900 mb-4">{t('time_settings')}</h3>
             <div className="space-y-3">
               <div>
-                <label className="block text-sm text-gray-600 mb-1">Start Time</label>
+                <label className="block text-sm text-gray-600 mb-1">{t('start_time')}</label>
                 <input
                   type="time"
                   value={startTime}
@@ -201,7 +202,7 @@ export default function GuideAvailability() {
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-600 mb-1">End Time</label>
+                <label className="block text-sm text-gray-600 mb-1">{t('end_time')}</label>
                 <input
                   type="time"
                   value={endTime}
@@ -210,7 +211,7 @@ export default function GuideAvailability() {
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-600 mb-1">Max Bookings/Day</label>
+                <label className="block text-sm text-gray-600 mb-1">{t('max_bookings_day')}</label>
                 <input
                   type="number"
                   min={1}
@@ -227,7 +228,7 @@ export default function GuideAvailability() {
               disabled={saving || selected.size === 0}
               className="w-full mt-4 bg-sky-600 text-white font-semibold py-2.5 rounded-lg hover:bg-sky-700 transition-colors disabled:opacity-50"
             >
-              {saving ? 'Saving...' : `Save ${selected.size} Date(s)`}
+              {saving ? t('saving') : t('save_dates', { count: selected.size })}
             </button>
 
             {message && (
@@ -239,9 +240,9 @@ export default function GuideAvailability() {
 
           {/* Existing slots for this month */}
           <div className="card p-6">
-            <h3 className="font-semibold text-gray-900 mb-3">This Month's Slots</h3>
+            <h3 className="font-semibold text-gray-900 mb-3">{t('this_month_slots')}</h3>
             {slots.filter((s) => s.is_available).length === 0 ? (
-              <p className="text-sm text-gray-400">No available dates set yet.</p>
+              <p className="text-sm text-gray-400">{t('no_dates_set')}</p>
             ) : (
               <div className="space-y-2 max-h-64 overflow-y-auto">
                 {slots
@@ -257,7 +258,7 @@ export default function GuideAvailability() {
                         onClick={() => removeSlot(s.id, s.date)}
                         className="text-red-500 hover:text-red-700 text-xs font-medium"
                       >
-                        Remove
+                        {t('remove')}
                       </button>
                     </div>
                   ))}

@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import api from '../../api/client'
 import LoadingBlock from '../../components/LoadingBlock'
+import { useLang } from '../../context/LanguageContext'
 import type { AuditEntry } from '../../types'
 
 export default function AdminAudit() {
+  const { t } = useLang()
   const [entries, setEntries] = useState<AuditEntry[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -18,20 +20,20 @@ export default function AdminAudit() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Audit Log</h2>
+      <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('audit_log')}</h2>
 
       {entries.length === 0 ? (
-        <div className="card p-12 text-center text-gray-400">No audit entries yet.</div>
+        <div className="card p-12 text-center text-gray-400">{t('no_audit_entries')}</div>
       ) : (
         <div className="card overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 text-left">
               <tr>
-                <th className="px-4 py-3 font-semibold text-gray-600">Action</th>
-                <th className="px-4 py-3 font-semibold text-gray-600">Actor</th>
-                <th className="px-4 py-3 font-semibold text-gray-600">Target</th>
-                <th className="px-4 py-3 font-semibold text-gray-600">Detail</th>
-                <th className="px-4 py-3 font-semibold text-gray-600">Time</th>
+                <th className="px-4 py-3 font-semibold text-gray-600">{t('action')}</th>
+                <th className="px-4 py-3 font-semibold text-gray-600">{t('actor')}</th>
+                <th className="px-4 py-3 font-semibold text-gray-600">{t('target')}</th>
+                <th className="px-4 py-3 font-semibold text-gray-600">{t('detail')}</th>
+                <th className="px-4 py-3 font-semibold text-gray-600">{t('time')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">

@@ -291,6 +291,34 @@ const it = {
   history: 'Cronologia',
   no_translations_yet: 'Ancora nessuna traduzione.',
   speech_not_supported: 'Riconoscimento vocale non supportato in questo browser',
+
+  // City Detail
+  city_not_found: 'Città non trovata.',
+  guides_in_city: 'Guide a {name}',
+  verified_local_guides_count: '{count} guide locali verificate',
+  experiences_in_city: 'Esperienze a {name}',
+  activities_to_choose: '{count} attività tra cui scegliere',
+
+  // Verification Explainer
+  verify_how_title: 'Come Funziona la Verifica VerifyID',
+  verify_how_desc: 'Ogni guida su SkyStriker passa attraverso il nostro processo di verifica basato su',
+  verify_how_confidence: 'Questo garantisce ai viaggiatori di poter prenotare con totale fiducia.',
+  verify_step1_title: 'Invia Documento d\'Identità',
+  verify_step1_desc: 'Carica un documento d\'identità con foto rilasciato dal governo tramite la Dashboard Guida sicura di SkyStriker. I tuoi documenti sono crittografati end-to-end e non vengono mai conservati sui nostri server dopo la verifica.',
+  verify_step2_title: 'Revisione da Thronos Chain',
+  verify_step2_desc: 'La tua identità viene verificata tramite Thronos Chain VerifyID, il nostro partner di verifica decentralizzata di fiducia. La revisione controlla l\'autenticità del documento e confronta le informazioni del tuo profilo.',
+  verify_step3_title: 'Badge Verificato',
+  verify_step3_desc: 'Una volta approvato, il tuo profilo mostra un badge verde "Verificato" visibile a tutti i viaggiatori. Questo badge indica che la tua identità è stata verificata, creando fiducia e aumentando le tue prenotazioni.',
+  verify_ready_title: 'Pronto a diventare una guida verificata?',
+  verify_ready_desc: 'Unisciti a centinaia di locali verificati che condividono esperienze autentiche con viaggiatori di tutto il mondo.',
+  verify_open_dashboard: 'Apri Dashboard Guida',
+
+  // Booking
+  no_bookings_yet: 'Ancora nessuna prenotazione.',
+  mark_complete: 'Segna come Completata',
+  no_experiences_found: 'Nessuna esperienza trovata.',
+  guest: 'ospite',
+  guests_plural: 'ospiti',
 }
 
 export default it

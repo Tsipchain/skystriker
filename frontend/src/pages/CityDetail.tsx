@@ -3,9 +3,11 @@ import { useParams, Link } from 'react-router-dom'
 import api from '../api/client'
 import DiscoveryCard from '../components/DiscoveryCard'
 import LoadingBlock from '../components/LoadingBlock'
+import { useLang } from '../context/LanguageContext'
 import type { CityDetail as CityDetailType } from '../types'
 
 export default function CityDetail() {
+  const { t } = useLang()
   const { slug } = useParams<{ slug: string }>()
   const [city, setCity] = useState<CityDetailType | null>(null)
   const [loading, setLoading] = useState(true)
@@ -19,7 +21,7 @@ export default function CityDetail() {
   }, [slug])
 
   if (loading) return <LoadingBlock />
-  if (!city) return <p className="text-center py-20 text-gray-400">City not found.</p>
+  if (!city) return <p className="text-center py-20 text-gray-400">{t('city_not_found')}</p>
 
   return (
     <div>
@@ -44,8 +46,8 @@ export default function CityDetail() {
         {/* Guides */}
         {city.guides.length > 0 && (
           <section className="mb-12">
-            <h2 className="section-title">Guides in {city.name}</h2>
-            <p className="section-subtitle">{city.guides.length} verified local guides</p>
+            <h2 className="section-title">{t('guides_in_city', { name: city.name })}</h2>
+            <p className="section-subtitle">{t('verified_local_guides_count', { count: city.guides.length })}</p>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {city.guides.map((g) => (
                 <Link key={g.id} to={`/guides/${g.id}`} className="card p-5 text-center hover:shadow-md transition-shadow">
@@ -60,7 +62,7 @@ export default function CityDetail() {
                   <span className={g.verification_status === 'verified' ? 'badge-verified mt-1' : 'badge-pending mt-1'}>
                     {g.verification_status}
                   </span>
-                  <p className="text-xs text-gray-400 mt-1">{g.rating.toFixed(1)} ({g.total_reviews} reviews)</p>
+                  <p className="text-xs text-gray-400 mt-1">{g.rating.toFixed(1)} ({g.total_reviews} {t('reviews')})</p>
                 </Link>
               ))}
             </div>
@@ -70,8 +72,8 @@ export default function CityDetail() {
         {/* Experiences */}
         {city.experiences.length > 0 && (
           <section>
-            <h2 className="section-title">Experiences in {city.name}</h2>
-            <p className="section-subtitle">{city.experiences.length} activities to choose from</p>
+            <h2 className="section-title">{t('experiences_in_city', { name: city.name })}</h2>
+            <p className="section-subtitle">{t('activities_to_choose', { count: city.experiences.length })}</p>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {city.experiences.map((e) => (
                 <DiscoveryCard
@@ -82,7 +84,7 @@ export default function CityDetail() {
                   subtitle={e.description}
                   badge={`${e.currency} ${e.price}`}
                   badgeColor="bg-emerald-600"
-                  meta={`${e.duration_minutes} min · ${e.avg_rating.toFixed(1)} stars · by ${e.guide_name}`}
+                  meta={`${e.duration_minutes} ${t('min')} · ${e.avg_rating.toFixed(1)} ${t('stars')} · ${t('by')} ${e.guide_name}`}
                 />
               ))}
             </div>

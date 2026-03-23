@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import api from '../../api/client'
 import LoadingBlock from '../../components/LoadingBlock'
+import { useLang } from '../../context/LanguageContext'
 import type { Booking } from '../../types'
 
 export default function GuideBookingRequests() {
+  const { t } = useLang()
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -33,10 +35,10 @@ export default function GuideBookingRequests() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Booking Requests</h2>
+      <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('booking_requests')}</h2>
 
       {bookings.length === 0 ? (
-        <div className="card p-12 text-center text-gray-400">No bookings yet.</div>
+        <div className="card p-12 text-center text-gray-400">{t('no_bookings_yet')}</div>
       ) : (
         <div className="space-y-4">
           {bookings.map((b) => (
@@ -46,7 +48,7 @@ export default function GuideBookingRequests() {
                   <h3 className="font-semibold text-gray-900">{b.guest_name}</h3>
                   <p className="text-sm text-gray-500">{b.guest_email}</p>
                   <p className="text-sm text-gray-500 mt-1">
-                    {b.requested_date} at {b.requested_time} · {b.guests_count} guest{b.guests_count !== 1 ? 's' : ''}
+                    {b.requested_date} at {b.requested_time} · {b.guests_count} {b.guests_count !== 1 ? t('guests_plural') : t('guest')}
                   </p>
                   <p className="text-sm text-gray-500">
                     {b.currency} {b.total_price.toFixed(2)}
@@ -65,16 +67,16 @@ export default function GuideBookingRequests() {
                   {b.status === 'requested' && (
                     <div className="flex gap-2">
                       <button onClick={() => handleAction(b.id, 'confirm')} className="text-xs btn-primary py-1 px-3">
-                        Confirm
+                        {t('confirm')}
                       </button>
                       <button onClick={() => handleAction(b.id, 'decline')} className="text-xs btn-secondary py-1 px-3">
-                        Decline
+                        {t('decline')}
                       </button>
                     </div>
                   )}
                   {b.status === 'confirmed' && (
                     <button onClick={() => handleAction(b.id, 'complete')} className="text-xs btn-primary py-1 px-3">
-                      Mark Complete
+                      {t('mark_complete')}
                     </button>
                   )}
                 </div>

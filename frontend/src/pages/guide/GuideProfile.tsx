@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import api from "../../api/client";
 import { GuideDetail } from "../../types";
 import LoadingBlock from "../../components/LoadingBlock";
+import { useLang } from "../../context/LanguageContext";
 
 export default function GuideProfile() {
+  const { t } = useLang();
   const [guide, setGuide] = useState<GuideDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -29,7 +31,7 @@ export default function GuideProfile() {
           Array.isArray(g.specialties) ? g.specialties.join(", ") : ""
         );
       })
-      .catch(() => setError("Failed to load profile."))
+      .catch(() => setError(t('failed_load_profile_short')))
       .finally(() => setLoading(false));
   }, []);
 
@@ -47,9 +49,9 @@ export default function GuideProfile() {
         languages: languages.split(",").map((l) => l.trim()).filter(Boolean),
         specialties: specialties.split(",").map((s) => s.trim()).filter(Boolean),
       });
-      setSuccess("Profile updated successfully.");
+      setSuccess(t('profile_updated'));
     } catch {
-      setError("Failed to update profile.");
+      setError(t('failed_update_profile'));
     } finally {
       setSaving(false);
     }
@@ -60,14 +62,14 @@ export default function GuideProfile() {
 
   return (
     <div className="max-w-2xl space-y-6">
-      <h1 className="text-2xl font-bold">Edit Profile</h1>
+      <h1 className="text-2xl font-bold">{t('edit_profile')}</h1>
 
       {error && <p className="text-red-600">{error}</p>}
       {success && <p className="text-green-600">{success}</p>}
 
       <form onSubmit={handleSubmit} className="card p-6 space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-1">Full Name</label>
+          <label className="block text-sm font-medium mb-1">{t('full_name')}</label>
           <input
             type="text"
             className="w-full border rounded px-3 py-2"
@@ -77,7 +79,7 @@ export default function GuideProfile() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Bio</label>
+          <label className="block text-sm font-medium mb-1">{t('bio')}</label>
           <textarea
             className="w-full border rounded px-3 py-2"
             rows={4}
@@ -87,7 +89,7 @@ export default function GuideProfile() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Phone</label>
+          <label className="block text-sm font-medium mb-1">{t('phone')}</label>
           <input
             type="text"
             className="w-full border rounded px-3 py-2"
@@ -98,7 +100,7 @@ export default function GuideProfile() {
 
         <div>
           <label className="block text-sm font-medium mb-1">
-            Languages (comma-separated)
+            {t('languages_comma')}
           </label>
           <input
             type="text"
@@ -110,7 +112,7 @@ export default function GuideProfile() {
 
         <div>
           <label className="block text-sm font-medium mb-1">
-            Specialties (comma-separated)
+            {t('specialties_comma')}
           </label>
           <input
             type="text"
@@ -125,7 +127,7 @@ export default function GuideProfile() {
           disabled={saving}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
         >
-          {saving ? "Saving..." : "Save Changes"}
+          {saving ? t('saving') : t('save_changes')}
         </button>
       </form>
     </div>

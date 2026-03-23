@@ -291,6 +291,34 @@ const pt = {
   history: 'Histórico',
   no_translations_yet: 'Nenhuma tradução ainda.',
   speech_not_supported: 'Reconhecimento de voz não suportado neste navegador',
+
+  // City Detail
+  city_not_found: 'Cidade não encontrada.',
+  guides_in_city: 'Guias em {name}',
+  verified_local_guides_count: '{count} guias locais verificados',
+  experiences_in_city: 'Experiências em {name}',
+  activities_to_choose: '{count} atividades para escolher',
+
+  // Verification Explainer
+  verify_how_title: 'Como Funciona a Verificação VerifyID',
+  verify_how_desc: 'Cada guia no SkyStriker passa pelo nosso processo de verificação com tecnologia da',
+  verify_how_confidence: 'Isso garante que os viajantes possam reservar com total confiança.',
+  verify_step1_title: 'Enviar ID',
+  verify_step1_desc: 'Envie um documento de identidade com foto emitido pelo governo através do Painel do Guia SkyStriker seguro. Seus documentos são criptografados de ponta a ponta e nunca armazenados em nossos servidores após a verificação.',
+  verify_step2_title: 'Análise pela Thronos Chain',
+  verify_step2_desc: 'Sua identidade é verificada através da Thronos Chain VerifyID, nosso parceiro de verificação descentralizada confiável. A análise verifica a autenticidade do documento e corresponde às informações do seu perfil.',
+  verify_step3_title: 'Selo de Verificado',
+  verify_step3_desc: 'Uma vez aprovado, seu perfil exibe um selo verde "Verificado" visível para todos os viajantes. Este selo indica que sua identidade foi verificada, gerando confiança e aumentando suas reservas.',
+  verify_ready_title: 'Pronto para se tornar um guia verificado?',
+  verify_ready_desc: 'Junte-se a centenas de locais verificados compartilhando experiências autênticas com viajantes do mundo todo.',
+  verify_open_dashboard: 'Abrir Painel do Guia',
+
+  // Booking
+  no_bookings_yet: 'Nenhuma reserva ainda.',
+  mark_complete: 'Marcar como Concluído',
+  no_experiences_found: 'Nenhuma experiência encontrada.',
+  guest: 'convidado',
+  guests_plural: 'convidados',
 }
 
 export default pt

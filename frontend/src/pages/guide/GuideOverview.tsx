@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import api from "../../api/client";
 import { GuideDetail } from "../../types";
 import LoadingBlock from "../../components/LoadingBlock";
+import { useLang } from "../../context/LanguageContext";
 
 export default function GuideOverview() {
+  const { t } = useLang();
   const [guide, setGuide] = useState<GuideDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -12,7 +14,7 @@ export default function GuideOverview() {
     api
       .get<GuideDetail>("/api/v1/guide/me")
       .then((data) => setGuide(data))
-      .catch(() => setError("Failed to load guide profile."))
+      .catch(() => setError(t('failed_load_profile')))
       .finally(() => setLoading(false));
   }, []);
 
@@ -21,14 +23,14 @@ export default function GuideOverview() {
   if (!guide) return null;
 
   const stats = [
-    { label: "Experiences", value: guide.experiences?.length ?? 0 },
-    { label: "Reviews", value: guide.total_reviews ?? 0 },
-    { label: "Rating", value: guide.rating ? guide.rating.toFixed(1) : "N/A" },
+    { label: t('experiences'), value: guide.experiences?.length ?? 0 },
+    { label: t('reviews'), value: guide.total_reviews ?? 0 },
+    { label: t('rating'), value: guide.rating ? guide.rating.toFixed(1) : "N/A" },
   ];
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Welcome back, {guide.full_name}!</h1>
+      <h1 className="text-2xl font-bold">{t('welcome_back_name', { name: guide.full_name })}</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {stats.map((s) => (

@@ -104,24 +104,24 @@ export default function PublicLayout() {
       <footer className="bg-gray-900 text-gray-400 py-10 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between gap-8 text-sm">
           <div>
-            <p className="text-white font-bold text-lg mb-1">SkyStriker Global Guides</p>
-            <p>Verified local guides &amp; destination experiences.</p>
-            <p className="mt-1">Part of the <span className="text-sky-400">Thronos Chain</span> ecosystem.</p>
+            <p className="text-white font-bold text-lg mb-1">{t('skystriker_global')}</p>
+            <p>{t('footer_tagline')}</p>
+            <p className="mt-1">{t('footer_ecosystem', { name: 'Thronos Chain' })}</p>
           </div>
           <div className="flex gap-8">
             <div>
-              <p className="text-white font-semibold mb-2">Explore</p>
+              <p className="text-white font-semibold mb-2">{t('explore')}</p>
               <ul className="space-y-1">
-                <li><Link to="/cities" className="hover:text-white">Cities</Link></li>
-                <li><Link to="/guides" className="hover:text-white">Guides</Link></li>
-                <li><Link to="/experiences" className="hover:text-white">Experiences</Link></li>
+                <li><Link to="/cities" className="hover:text-white">{t('cities')}</Link></li>
+                <li><Link to="/guides" className="hover:text-white">{t('guides')}</Link></li>
+                <li><Link to="/experiences" className="hover:text-white">{t('experiences')}</Link></li>
               </ul>
             </div>
             <div>
-              <p className="text-white font-semibold mb-2">Platform</p>
+              <p className="text-white font-semibold mb-2">{t('platform')}</p>
               <ul className="space-y-1">
-                <li><Link to="/verification" className="hover:text-white">Verification</Link></li>
-                <li><Link to="/guide" className="hover:text-white">Guide Dashboard</Link></li>
+                <li><Link to="/verification" className="hover:text-white">{t('verification')}</Link></li>
+                <li><Link to="/guide" className="hover:text-white">{t('guide_dashboard')}</Link></li>
               </ul>
             </div>
           </div>

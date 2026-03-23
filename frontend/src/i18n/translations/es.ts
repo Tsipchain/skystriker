@@ -291,6 +291,34 @@ const es = {
   history: 'Historial',
   no_translations_yet: 'Aún no hay traducciones.',
   speech_not_supported: 'Reconocimiento de voz no soportado en este navegador',
+
+  // City Detail
+  city_not_found: 'Ciudad no encontrada.',
+  guides_in_city: 'Guías en {name}',
+  verified_local_guides_count: '{count} guías locales verificados',
+  experiences_in_city: 'Experiencias en {name}',
+  activities_to_choose: '{count} actividades para elegir',
+
+  // Verification Explainer
+  verify_how_title: 'Cómo Funciona la Verificación VerifyID',
+  verify_how_desc: 'Cada guía en SkyStriker pasa por nuestro proceso de verificación impulsado por',
+  verify_how_confidence: 'Esto garantiza que los viajeros puedan reservar con total confianza.',
+  verify_step1_title: 'Enviar ID',
+  verify_step1_desc: 'Sube un documento de identidad con foto emitido por el gobierno a través del Panel de Guía seguro de SkyStriker. Tus documentos están cifrados de extremo a extremo y nunca se almacenan en nuestros servidores después de la verificación.',
+  verify_step2_title: 'Revisión por Thronos Chain',
+  verify_step2_desc: 'Tu identidad es verificada a través de Thronos Chain VerifyID, nuestro socio de verificación descentralizada de confianza. La revisión comprueba la autenticidad del documento y coincide con la información de tu perfil.',
+  verify_step3_title: 'Insignia de Verificado',
+  verify_step3_desc: 'Una vez aprobado, tu perfil muestra una insignia verde de "Verificado" visible para todos los viajeros. Esta insignia indica que tu identidad ha sido comprobada, generando confianza y aumentando tus reservas.',
+  verify_ready_title: '¿Listo para convertirte en un guía verificado?',
+  verify_ready_desc: 'Únete a cientos de locales verificados que comparten experiencias auténticas con viajeros de todo el mundo.',
+  verify_open_dashboard: 'Abrir Panel de Guía',
+
+  // Booking
+  no_bookings_yet: 'Aún no hay reservas.',
+  mark_complete: 'Marcar como Completado',
+  no_experiences_found: 'No se encontraron experiencias.',
+  guest: 'invitado',
+  guests_plural: 'invitados',
 }
 
 export default es

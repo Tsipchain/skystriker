@@ -291,6 +291,34 @@ const de = {
   history: 'Verlauf',
   no_translations_yet: 'Noch keine Übersetzungen.',
   speech_not_supported: 'Spracherkennung wird in diesem Browser nicht unterstützt',
+
+  // City Detail
+  city_not_found: 'Stadt nicht gefunden.',
+  guides_in_city: 'Guides in {name}',
+  verified_local_guides_count: '{count} verifizierte lokale Guides',
+  experiences_in_city: 'Erlebnisse in {name}',
+  activities_to_choose: '{count} Aktivitäten zur Auswahl',
+
+  // Verification Explainer
+  verify_how_title: 'So funktioniert die VerifyID-Verifizierung',
+  verify_how_desc: 'Jeder Guide auf SkyStriker durchläuft unseren Verifizierungsprozess, unterstützt von',
+  verify_how_confidence: 'So können Reisende mit vollem Vertrauen buchen.',
+  verify_step1_title: 'Ausweis einreichen',
+  verify_step1_desc: 'Laden Sie einen amtlichen Lichtbildausweis über das sichere SkyStriker Guide Dashboard hoch. Ihre Dokumente werden Ende-zu-Ende verschlüsselt und nach der Verifizierung nicht auf unseren Servern gespeichert.',
+  verify_step2_title: 'Prüfung durch Thronos Chain',
+  verify_step2_desc: 'Ihre Identität wird über Thronos Chain VerifyID verifiziert, unseren vertrauenswürdigen dezentralen Verifizierungspartner. Die Prüfung überprüft die Echtheit des Dokuments und gleicht Ihre Profilinformationen ab.',
+  verify_step3_title: 'Verifiziert-Abzeichen',
+  verify_step3_desc: 'Nach der Genehmigung zeigt Ihr Profil ein grünes „Verifiziert"-Abzeichen an, das für alle Reisenden sichtbar ist. Dieses Abzeichen signalisiert, dass Ihre Identität überprüft wurde, stärkt das Vertrauen und steigert Ihre Buchungen.',
+  verify_ready_title: 'Bereit, ein verifizierter Guide zu werden?',
+  verify_ready_desc: 'Schließen Sie sich Hunderten von verifizierten Einheimischen an, die authentische Erlebnisse mit Reisenden weltweit teilen.',
+  verify_open_dashboard: 'Guide Dashboard öffnen',
+
+  // Booking
+  no_bookings_yet: 'Noch keine Buchungen.',
+  mark_complete: 'Als abgeschlossen markieren',
+  no_experiences_found: 'Keine Erlebnisse gefunden.',
+  guest: 'Gast',
+  guests_plural: 'Gäste',
 }
 
 export default de

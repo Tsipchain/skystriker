@@ -1,22 +1,25 @@
 import { Link, Outlet, useLocation, Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useLang } from '../context/LanguageContext'
+import LanguageSwitcher from './LanguageSwitcher'
 import RoleSwitcher from './RoleSwitcher'
 
-const SIDEBAR = [
-  { to: '/guide', label: 'Overview', icon: '📊' },
-  { to: '/guide/profile', label: 'My Profile', icon: '👤' },
-  { to: '/guide/verification', label: 'Verification', icon: '✅' },
-  { to: '/guide/experiences', label: 'Experiences', icon: '🗺️' },
-  { to: '/guide/availability', label: 'Availability', icon: '📅' },
-  { to: '/guide/bookings', label: 'Booking Requests', icon: '📩' },
-  { to: '/guide/reviews', label: 'Reviews', icon: '⭐' },
-  { to: '/guide/translator', label: 'AI Translator', icon: '🌐', premium: true },
-  { to: '/guide/settings', label: 'Settings', icon: '⚙️' },
-]
-
 export default function DashboardLayout() {
+  const { t } = useLang()
   const { pathname } = useLocation()
   const { user, logout } = useAuth()
+
+  const SIDEBAR = [
+    { to: '/guide', label: t('overview'), icon: '📊' },
+    { to: '/guide/profile', label: t('my_profile'), icon: '👤' },
+    { to: '/guide/verification', label: t('verification'), icon: '✅' },
+    { to: '/guide/experiences', label: t('my_experiences'), icon: '🗺️' },
+    { to: '/guide/availability', label: t('availability'), icon: '📅' },
+    { to: '/guide/bookings', label: t('booking_requests'), icon: '📩' },
+    { to: '/guide/reviews', label: t('my_reviews'), icon: '⭐' },
+    { to: '/guide/translator', label: t('ai_translator'), icon: '🌐', premium: true },
+    { to: '/guide/settings', label: t('settings'), icon: '⚙️' },
+  ]
 
   // If not logged in and no demo guide selected, redirect to auth
   const hasGuideId = !!localStorage.getItem('skystriker_guide_id')
@@ -47,7 +50,7 @@ export default function DashboardLayout() {
               <span>{s.icon}</span>
               <span className="flex-1">{s.label}</span>
               {'premium' in s && s.premium && (
-                <span className="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-semibold">PRO</span>
+                <span className="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-semibold">{t('pro_badge')}</span>
               )}
             </Link>
           ))}
@@ -75,7 +78,7 @@ export default function DashboardLayout() {
               onClick={() => { logout(); window.location.href = '/' }}
               className="w-full text-xs text-gray-400 hover:text-gray-600 py-1"
             >
-              Log out
+              {t('logout')}
             </button>
           )}
         </div>
@@ -84,9 +87,10 @@ export default function DashboardLayout() {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 lg:px-8 sticky top-0 z-20">
-          <h1 className="text-lg font-semibold text-gray-900">Guide Dashboard</h1>
+          <h1 className="text-lg font-semibold text-gray-900">{t('guide_dashboard')}</h1>
           <div className="flex items-center gap-4">
-            <Link to="/" className="text-sm text-sky-600 hover:underline">Back to site</Link>
+            <LanguageSwitcher />
+            <Link to="/" className="text-sm text-sky-600 hover:underline">{t('back_to_site')}</Link>
           </div>
         </header>
         <main className="flex-1 p-6 lg:p-8 overflow-auto">
