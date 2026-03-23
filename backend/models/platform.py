@@ -314,6 +314,33 @@ class GuideAvailability(Base):
 
 
 # ---------------------------------------------------------------------------
+# Subscription (AI Translator)
+# ---------------------------------------------------------------------------
+
+class SubscriptionStatus(str, enum.Enum):
+    trial = "trial"
+    active = "active"
+    cancelled = "cancelled"
+    expired = "expired"
+
+
+class Subscription(Base):
+    __tablename__ = "subscriptions"
+
+    id = Column(String(36), primary_key=True, default=_uuid)
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
+    plan = Column(String(50), default="translator_monthly")
+    status = Column(Enum(SubscriptionStatus), default=SubscriptionStatus.trial, nullable=False)
+    price = Column(Float, default=4.99)
+    currency = Column(String(6), default="EUR")
+    started_at = Column(DateTime, default=_utcnow, nullable=False)
+    expires_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, default=_utcnow, nullable=False)
+
+    user = relationship("User", backref="subscriptions")
+
+
+# ---------------------------------------------------------------------------
 # Audit log
 # ---------------------------------------------------------------------------
 

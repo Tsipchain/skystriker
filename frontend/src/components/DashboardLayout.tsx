@@ -10,6 +10,7 @@ const SIDEBAR = [
   { to: '/guide/availability', label: 'Availability', icon: '📅' },
   { to: '/guide/bookings', label: 'Booking Requests', icon: '📩' },
   { to: '/guide/reviews', label: 'Reviews', icon: '⭐' },
+  { to: '/guide/translator', label: 'AI Translator', icon: '🌐', premium: true },
   { to: '/guide/settings', label: 'Settings', icon: '⚙️' },
 ]
 
@@ -43,7 +44,11 @@ export default function DashboardLayout() {
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
-              <span>{s.icon}</span> {s.label}
+              <span>{s.icon}</span>
+              <span className="flex-1">{s.label}</span>
+              {'premium' in s && s.premium && (
+                <span className="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-semibold">PRO</span>
+              )}
             </Link>
           ))}
         </nav>

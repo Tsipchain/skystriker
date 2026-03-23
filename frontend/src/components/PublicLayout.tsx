@@ -1,17 +1,20 @@
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useLang } from '../context/LanguageContext'
+import LanguageSwitcher from './LanguageSwitcher'
 
-const NAV_LINKS = [
-  { to: '/', label: 'Home' },
-  { to: '/cities', label: 'Cities' },
-  { to: '/guides', label: 'Guides' },
-  { to: '/experiences', label: 'Experiences' },
-  { to: '/verification', label: 'Verification' },
+const NAV_KEYS = [
+  { to: '/', key: 'home' as const },
+  { to: '/cities', key: 'cities' as const },
+  { to: '/guides', key: 'guides' as const },
+  { to: '/experiences', key: 'experiences' as const },
+  { to: '/verification', key: 'verification' as const },
 ]
 
 export default function PublicLayout() {
   const { pathname } = useLocation()
   const { user, logout } = useAuth()
+  const { t } = useLang()
   const navigate = useNavigate()
 
   return (
@@ -24,7 +27,7 @@ export default function PublicLayout() {
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">
-            {NAV_LINKS.map((l) => (
+            {NAV_KEYS.map((l) => (
               <Link
                 key={l.to}
                 to={l.to}
@@ -34,22 +37,23 @@ export default function PublicLayout() {
                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                 }`}
               >
-                {l.label}
+                {t(l.key)}
               </Link>
             ))}
           </nav>
 
           <div className="flex items-center gap-2">
+            <LanguageSwitcher />
             {user ? (
               <>
                 {user.role === 'guide' && (
                   <Link to="/guide" className="text-sm font-medium text-sky-600 hover:text-sky-700 px-3 py-2">
-                    Dashboard
+                    {t('dashboard')}
                   </Link>
                 )}
                 {user.role === 'admin' && (
                   <Link to="/admin" className="text-sm font-medium text-purple-600 hover:text-purple-700 px-3 py-2">
-                    Admin
+                    {t('admin')}
                   </Link>
                 )}
                 <div className="flex items-center gap-2 pl-2 border-l border-gray-200">
@@ -67,7 +71,7 @@ export default function PublicLayout() {
                     onClick={() => { logout(); navigate('/') }}
                     className="text-xs text-gray-400 hover:text-gray-600 ml-1"
                   >
-                    Logout
+                    {t('logout')}
                   </button>
                 </div>
               </>
@@ -77,13 +81,13 @@ export default function PublicLayout() {
                   to="/auth"
                   className="text-sm font-medium text-gray-600 hover:text-gray-900 px-3 py-2"
                 >
-                  Log In
+                  {t('login')}
                 </Link>
                 <Link
                   to="/auth"
                   className="text-sm font-medium bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-colors"
                 >
-                  Sign Up
+                  {t('signup')}
                 </Link>
               </>
             )}
