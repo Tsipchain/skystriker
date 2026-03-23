@@ -64,17 +64,21 @@ def decode_token(token: str) -> Optional[dict]:
     try:
         parts = token.split(".")
         if len(parts) != 3:
+            logger.warning("JWT rejected: wrong number of parts (%d)", len(parts))
             return None
         sig_input = f"{parts[0]}.{parts[1]}".encode()
         expected = hmac.new(settings.jwt_secret.encode(), sig_input, hashlib.sha256).digest()
         actual = _b64url_decode(parts[2])
         if not hmac.compare_digest(expected, actual):
+            logger.warning("JWT rejected: signature mismatch")
             return None
         payload = json.loads(_b64url_decode(parts[1]))
         if payload.get("exp", 0) < datetime.utcnow().timestamp():
+            logger.info("JWT rejected: token expired (sub=%s)", payload.get("sub", "?"))
             return None
         return payload
     except Exception:
+        logger.exception("JWT decode error")
         return None
 
 

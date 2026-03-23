@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useLang } from '../context/LanguageContext'
 
 export default function Auth() {
+  const { t } = useLang()
   const [mode, setMode] = useState<'login' | 'signup'>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -26,22 +28,26 @@ export default function Auth() {
     try {
       if (mode === 'login') {
         await login(email, password)
+        // After login, read the stored user to determine role-based redirect
+        const stored = localStorage.getItem('skystriker_user')
+        const u = stored ? JSON.parse(stored) : null
+        navigate(u?.role === 'guide' ? '/guide' : u?.role === 'admin' ? '/admin' : '/')
       } else {
         if (!fullName.trim()) {
-          setError('Full name is required')
+          setError(t('full_name_required'))
           setSubmitting(false)
           return
         }
         if (password.length < 6) {
-          setError('Password must be at least 6 characters')
+          setError(t('password_min_6'))
           setSubmitting(false)
           return
         }
         await signup(email, password, fullName, role)
+        navigate(role === 'guide' ? '/guide' : '/')
       }
-      navigate(role === 'guide' ? '/guide' : '/')
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Authentication failed')
+      setError(err instanceof Error ? err.message : t('auth_failed'))
     } finally {
       setSubmitting(false)
     }
@@ -52,7 +58,7 @@ export default function Auth() {
     // Try loading Google Identity Services
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
     if (!clientId) {
-      setError('Google Sign-In is not yet configured. Please use email login.')
+      setError(t('google_not_configured'))
       return
     }
 
@@ -71,7 +77,7 @@ export default function Auth() {
   function renderGoogleButton(clientId: string) {
     const g = (window as unknown as Record<string, unknown>).google as Record<string, unknown> | undefined
     if (!g) {
-      setError('Failed to load Google Sign-In')
+      setError(t('google_load_failed'))
       return
     }
     const accounts = g.accounts as Record<string, unknown>
@@ -85,9 +91,11 @@ export default function Auth() {
         setSubmitting(true)
         try {
           await googleLogin(response.credential, role)
-          navigate(role === 'guide' ? '/guide' : '/')
+          const stored = localStorage.getItem('skystriker_user')
+          const u = stored ? JSON.parse(stored) : null
+          navigate(u?.role === 'guide' ? '/guide' : u?.role === 'admin' ? '/admin' : '/')
         } catch (err: unknown) {
-          setError(err instanceof Error ? err.message : 'Google authentication failed')
+          setError(err instanceof Error ? err.message : t('google_auth_failed'))
         } finally {
           setSubmitting(false)
         }
@@ -104,7 +112,7 @@ export default function Auth() {
             <span className="text-3xl">&#9992;</span> SkyStriker
           </Link>
           <p className="text-gray-500 mt-2">
-            {mode === 'login' ? 'Welcome back' : 'Create your account'}
+            {mode === 'login' ? t('welcome_back') : t('create_account')}
           </p>
         </div>
 
@@ -119,7 +127,7 @@ export default function Auth() {
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
-              Log In
+              {t('login')}
             </button>
             <button
               onClick={() => setMode('signup')}
@@ -129,14 +137,14 @@ export default function Auth() {
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
-              Sign Up
+              {t('signup')}
             </button>
           </div>
 
           {/* Role selector (for signup) */}
           {mode === 'signup' && (
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">I want to</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t('i_want_to')}</label>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
@@ -148,7 +156,7 @@ export default function Auth() {
                   }`}
                 >
                   <span className="block text-lg mb-1">&#127758;</span>
-                  Book Experiences
+                  {t('book_experiences')}
                 </button>
                 <button
                   type="button"
@@ -160,7 +168,7 @@ export default function Auth() {
                   }`}
                 >
                   <span className="block text-lg mb-1">&#127915;</span>
-                  Become a Guide
+                  {t('become_guide')}
                 </button>
               </div>
             </div>
@@ -179,7 +187,7 @@ export default function Auth() {
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
             </svg>
-            {mode === 'login' ? 'Sign in with Google' : 'Sign up with Google'}
+            {mode === 'login' ? t('sign_in_google') : t('sign_up_google')}
           </button>
 
           <div className="relative my-6">
@@ -187,27 +195,27 @@ export default function Auth() {
               <div className="w-full border-t border-gray-200" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-400">or continue with email</span>
+              <span className="px-4 bg-white text-gray-400">{t('or_continue_email')}</span>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === 'signup' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('full_name')}</label>
                 <input
                   type="text"
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
-                  placeholder="Your full name"
+                  placeholder={t('full_name')}
                 />
               </div>
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('email')}</label>
               <input
                 type="email"
                 required
@@ -219,14 +227,14 @@ export default function Auth() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('password')}</label>
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
-                placeholder={mode === 'signup' ? 'At least 6 characters' : 'Your password'}
+                placeholder={mode === 'signup' ? t('at_least_6_chars') : t('password')}
               />
             </div>
 
@@ -242,16 +250,16 @@ export default function Auth() {
               className="w-full bg-sky-600 text-white font-semibold py-2.5 rounded-lg hover:bg-sky-700 transition-colors disabled:opacity-50"
             >
               {submitting
-                ? 'Please wait...'
+                ? t('please_wait')
                 : mode === 'login'
-                  ? 'Log In'
-                  : 'Create Account'}
+                  ? t('login')
+                  : t('create_account_btn')}
             </button>
           </form>
         </div>
 
         <p className="text-center text-sm text-gray-500 mt-6">
-          <Link to="/" className="text-sky-600 hover:underline">Back to home</Link>
+          <Link to="/" className="text-sky-600 hover:underline">{t('back_to_home')}</Link>
         </p>
       </div>
     </div>

@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../api/client'
 import LoadingBlock from '../components/LoadingBlock'
+import { useLang } from '../context/LanguageContext'
 import type { GuideCard } from '../types'
 
 export default function Guides() {
+  const { t } = useLang()
   const [guides, setGuides] = useState<GuideCard[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -19,8 +21,8 @@ export default function Guides() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <h1 className="section-title">Guides</h1>
-      <p className="section-subtitle">Verified locals ready to share their city with you</p>
+      <h1 className="section-title">{t('guides')}</h1>
+      <p className="section-subtitle">{t('guides_subtitle')}</p>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {guides.map((g) => (
@@ -36,10 +38,10 @@ export default function Guides() {
             <p className="text-sm text-gray-500">{g.city_name}{g.country_name ? `, ${g.country_name}` : ''}</p>
             <div className="mt-2 flex items-center justify-center gap-2">
               <span className={g.verification_status === 'verified' ? 'badge-verified' : g.verification_status === 'pending' ? 'badge-pending' : 'badge-unverified'}>
-                {g.verification_status}
+                {t(g.verification_status as 'verified' | 'pending' | 'unverified')}
               </span>
             </div>
-            <p className="text-xs text-gray-400 mt-2">{g.rating.toFixed(1)} rating · {g.total_reviews} reviews</p>
+            <p className="text-xs text-gray-400 mt-2">{g.rating.toFixed(1)} {t('rating').toLowerCase()} · {g.total_reviews} {t('reviews').toLowerCase()}</p>
             {g.languages.length > 0 && (
               <p className="text-xs text-gray-400 mt-1">{g.languages.join(', ')}</p>
             )}
@@ -48,7 +50,7 @@ export default function Guides() {
       </div>
 
       {guides.length === 0 && (
-        <p className="text-gray-400 text-center py-12">No guides found.</p>
+        <p className="text-gray-400 text-center py-12">{t('no_guides')}</p>
       )}
     </div>
   )

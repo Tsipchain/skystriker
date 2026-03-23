@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react'
 import api from '../api/client'
 import DiscoveryCard from '../components/DiscoveryCard'
 import LoadingBlock from '../components/LoadingBlock'
+import { useLang } from '../context/LanguageContext'
 import type { ExperienceCard } from '../types'
 
 export default function Experiences() {
+  const { t } = useLang()
   const [experiences, setExperiences] = useState<ExperienceCard[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -19,8 +21,8 @@ export default function Experiences() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <h1 className="section-title">Experiences</h1>
-      <p className="section-subtitle">Authentic destination activities from verified local guides</p>
+      <h1 className="section-title">{t('experiences')}</h1>
+      <p className="section-subtitle">{t('experiences_subtitle')}</p>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {experiences.map((e) => (
@@ -32,13 +34,13 @@ export default function Experiences() {
             subtitle={e.description}
             badge={`${e.currency} ${e.price}`}
             badgeColor="bg-emerald-600"
-            meta={`${e.city_name} · ${e.duration_minutes} min · ${e.avg_rating.toFixed(1)} stars · by ${e.guide_name}`}
+            meta={`${e.city_name} · ${e.duration_minutes} ${t('min')} · ${e.avg_rating.toFixed(1)} ${t('stars')} · ${t('by')} ${e.guide_name}`}
           />
         ))}
       </div>
 
       {experiences.length === 0 && (
-        <p className="text-gray-400 text-center py-12">No experiences found.</p>
+        <p className="text-gray-400 text-center py-12">{t('no_experiences')}</p>
       )}
     </div>
   )

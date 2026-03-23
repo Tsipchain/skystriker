@@ -3,9 +3,11 @@ import { useParams, Link } from 'react-router-dom'
 import api from '../api/client'
 import LoadingBlock from '../components/LoadingBlock'
 import BookingCalendar from '../components/BookingCalendar'
+import { useLang } from '../context/LanguageContext'
 import type { ExperienceCard, Booking } from '../types'
 
 export default function ExperienceDetail() {
+  const { t } = useLang()
   const { slug } = useParams<{ slug: string }>()
   const [exp, setExp] = useState<ExperienceCard | null>(null)
   const [loading, setLoading] = useState(true)
@@ -52,7 +54,7 @@ export default function ExperienceDetail() {
   }
 
   if (loading) return <LoadingBlock />
-  if (!exp) return <p className="text-center py-20 text-gray-400">Experience not found.</p>
+  if (!exp) return <p className="text-center py-20 text-gray-400">{t('experience_not_found')}</p>
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -68,7 +70,7 @@ export default function ExperienceDetail() {
           <div>
             <h1 className="text-3xl font-bold text-gray-900">{exp.title}</h1>
             <p className="text-gray-500 mt-1">
-              {exp.city_name} · by{' '}
+              {exp.city_name} · {t('by')}{' '}
               <Link to={`/guides/${exp.guide_id}`} className="text-sky-600 hover:underline">
                 {exp.guide_name}
               </Link>
@@ -78,7 +80,7 @@ export default function ExperienceDetail() {
             <p className="text-3xl font-bold text-emerald-600">
               {exp.currency} {exp.price}
             </p>
-            <p className="text-sm text-gray-500">per person</p>
+            <p className="text-sm text-gray-500">{t('per_person')}</p>
           </div>
         </div>
 
@@ -86,26 +88,26 @@ export default function ExperienceDetail() {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-gray-400 text-xs uppercase tracking-wider">Duration</p>
-            <p className="font-semibold text-gray-900">{exp.duration_minutes} min</p>
+            <p className="text-gray-400 text-xs uppercase tracking-wider">{t('duration')}</p>
+            <p className="font-semibold text-gray-900">{exp.duration_minutes} {t('min')}</p>
           </div>
           <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-gray-400 text-xs uppercase tracking-wider">Max guests</p>
+            <p className="text-gray-400 text-xs uppercase tracking-wider">{t('max_guests')}</p>
             <p className="font-semibold text-gray-900">{exp.max_guests}</p>
           </div>
           <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-gray-400 text-xs uppercase tracking-wider">Rating</p>
+            <p className="text-gray-400 text-xs uppercase tracking-wider">{t('rating')}</p>
             <p className="font-semibold text-gray-900">{exp.avg_rating.toFixed(1)} / 5</p>
           </div>
           <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-gray-400 text-xs uppercase tracking-wider">Category</p>
+            <p className="text-gray-400 text-xs uppercase tracking-wider">{t('category')}</p>
             <p className="font-semibold text-gray-900 capitalize">{exp.category.replace(/_/g, ' ')}</p>
           </div>
         </div>
 
         {exp.languages.length > 0 && (
           <p className="text-sm text-gray-500 mt-4">
-            <span className="font-medium text-gray-700">Languages:</span> {exp.languages.join(', ')}
+            <span className="font-medium text-gray-700">{t('languages_label')}:</span> {exp.languages.join(', ')}
           </p>
         )}
       </div>
@@ -126,19 +128,19 @@ export default function ExperienceDetail() {
 
       {/* Booking form */}
       <div className="card p-8">
-        <h2 className="section-title">Book This Experience</h2>
-        <p className="section-subtitle mb-6">Fill in your details to request a booking</p>
+        <h2 className="section-title">{t('book_experience')}</h2>
+        <p className="section-subtitle mb-6">{t('booking_details')}</p>
 
         {bookingSuccess ? (
           <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-6 text-center">
-            <p className="text-emerald-800 font-semibold text-lg mb-1">Booking request submitted!</p>
-            <p className="text-emerald-600 text-sm">The guide will review your request and get back to you shortly.</p>
+            <p className="text-emerald-800 font-semibold text-lg mb-1">{t('booking_submitted')}</p>
+            <p className="text-emerald-600 text-sm">{t('booking_submitted_desc')}</p>
           </div>
         ) : (
           <form onSubmit={handleBooking} className="space-y-4">
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('guest_name')}</label>
                 <input
                   type="text"
                   required
@@ -148,7 +150,7 @@ export default function ExperienceDetail() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('guest_email')}</label>
                 <input
                   type="email"
                   required
@@ -158,7 +160,7 @@ export default function ExperienceDetail() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('guest_phone')}</label>
                 <input
                   type="tel"
                   value={guestPhone}
@@ -167,7 +169,7 @@ export default function ExperienceDetail() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Number of Guests</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('guests_count')}</label>
                 <input
                   type="number"
                   required
@@ -179,7 +181,7 @@ export default function ExperienceDetail() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Date</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('preferred_date')}</label>
                 <input
                   type="date"
                   required
@@ -189,7 +191,7 @@ export default function ExperienceDetail() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Time</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('preferred_time')}</label>
                 <input
                   type="time"
                   required
@@ -200,13 +202,13 @@ export default function ExperienceDetail() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Note (optional)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('note_optional')}</label>
               <textarea
                 rows={3}
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
-                placeholder="Any special requests or questions for the guide..."
+                placeholder={t('special_requests_placeholder')}
               />
             </div>
 
@@ -216,14 +218,14 @@ export default function ExperienceDetail() {
 
             <div className="flex items-center justify-between pt-2">
               <p className="text-sm text-gray-500">
-                Total: <span className="font-bold text-gray-900">{exp.currency} {exp.price * guestsCount}</span>
+                {t('total')}: <span className="font-bold text-gray-900">{exp.currency} {exp.price * guestsCount}</span>
               </p>
               <button
                 type="submit"
                 disabled={submitting}
                 className="bg-sky-600 text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-sky-700 transition-colors disabled:opacity-50"
               >
-                {submitting ? 'Submitting...' : 'Request Booking'}
+                {submitting ? t('submitting') : t('request_booking')}
               </button>
             </div>
           </form>

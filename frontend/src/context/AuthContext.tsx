@@ -20,6 +20,8 @@ export function useAuth() {
 }
 
 function setSession(token: string, user: AuthUser) {
+  // Clear all auth data first to prevent stale values from previous session
+  clearSession()
   localStorage.setItem('skystriker_token', token)
   localStorage.setItem('skystriker_user', JSON.stringify(user))
   if (user.guide_id) {

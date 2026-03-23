@@ -32,6 +32,15 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
   })
 
   if (!res.ok) {
+    // Auto-logout on 401 (expired / invalid token)
+    if (res.status === 401 && token && !path.includes('/auth/')) {
+      localStorage.removeItem('skystriker_token')
+      localStorage.removeItem('skystriker_user')
+      localStorage.removeItem('skystriker_guide_id')
+      localStorage.removeItem('skystriker_admin_token')
+      window.location.href = '/auth'
+      throw new Error('Session expired – please log in again')
+    }
     const detail = await res.json().catch(() => ({}))
     throw new Error(detail.detail || `Request failed: ${res.status}`)
   }

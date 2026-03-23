@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../api/client'
 import LoadingBlock from '../components/LoadingBlock'
+import { useLang } from '../context/LanguageContext'
 import type { Country } from '../types'
 
 export default function Countries() {
+  const { t } = useLang()
   const [countries, setCountries] = useState<Country[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -19,8 +21,8 @@ export default function Countries() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <h1 className="section-title">Countries</h1>
-      <p className="section-subtitle">Explore destinations by country</p>
+      <h1 className="section-title">{t('countries')}</h1>
+      <p className="section-subtitle">{t('explore_by_country')}</p>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {countries.map((c) => (
@@ -41,7 +43,7 @@ export default function Countries() {
       </div>
 
       {countries.length === 0 && (
-        <p className="text-gray-400 text-center py-12">No countries found.</p>
+        <p className="text-gray-400 text-center py-12">{t('no_countries')}</p>
       )}
     </div>
   )

@@ -38,6 +38,11 @@ def get_current_guide(
                 ).scalar_one_or_none()
                 if guide:
                     return guide
+                logger.warning("Auth: user %s found but no guide record (user_id match)", user.id)
+            else:
+                logger.warning("Auth: JWT valid but user %s not in DB", payload.get("sub"))
+        else:
+            logger.warning("Auth: Bearer token present but decode failed")
 
     # Fallback to X-Guide-Id header
     if x_guide_id:
@@ -46,6 +51,7 @@ def get_current_guide(
         ).scalar_one_or_none()
         if guide:
             return guide
+        logger.warning("Auth: X-Guide-Id %s not found in DB", x_guide_id)
 
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
