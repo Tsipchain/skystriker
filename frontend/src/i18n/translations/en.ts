@@ -329,6 +329,14 @@ const en = {
   guest: 'guest',
   guests_plural: 'guests',
   your_payout: 'Your payout',
+  bookings_payouts: 'Bookings & Payouts',
+  all_bookings: 'All Bookings',
+  pending_payouts: 'Pending Payouts',
+  released: 'Released',
+  platform_fee_label: 'Platform fee',
+  guide_payout_label: 'Guide payout',
+  payout: 'Payout',
+  release_payout: 'Release Payout',
 }
 
 export default en

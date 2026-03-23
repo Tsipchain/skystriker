@@ -204,6 +204,7 @@ class BookingOut(BaseModel):
     total_price: float = 0.0
     platform_fee: float = 0.0
     guide_payout: float = 0.0
+    payout_status: str = "pending"
     currency: str = "EUR"
     status: str = "requested"
     note: str = ""

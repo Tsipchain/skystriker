@@ -329,6 +329,14 @@ const el = {
   guest: 'επισκέπτης',
   guests_plural: 'επισκέπτες',
   your_payout: 'Η πληρωμή σου',
+  bookings_payouts: 'Κρατήσεις & Πληρωμές',
+  all_bookings: 'Όλες οι Κρατήσεις',
+  pending_payouts: 'Εκκρεμείς Πληρωμές',
+  released: 'Αποδεσμευμένο',
+  platform_fee_label: 'Προμήθεια',
+  guide_payout_label: 'Πληρωμή ξεναγού',
+  payout: 'Πληρωμή',
+  release_payout: 'Αποδέσμευση Πληρωμής',
 }
 
 export default el

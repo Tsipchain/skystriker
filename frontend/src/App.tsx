@@ -37,6 +37,7 @@ import AdminGuides from './pages/admin/AdminGuides'
 import AdminVerifications from './pages/admin/AdminVerifications'
 import AdminExperiences from './pages/admin/AdminExperiences'
 import AdminReviews from './pages/admin/AdminReviews'
+import AdminBookings from './pages/admin/AdminBookings'
 import AdminAudit from './pages/admin/AdminAudit'
 
 function App() {
@@ -81,6 +82,7 @@ function App() {
               <Route path="verifications" element={<AdminVerifications />} />
               <Route path="experiences" element={<AdminExperiences />} />
               <Route path="reviews" element={<AdminReviews />} />
+              <Route path="bookings" element={<AdminBookings />} />
               <Route path="audit" element={<AdminAudit />} />
             </Route>
 

@@ -57,6 +57,11 @@ class Settings(BaseSettings):
     # Platform commission (0.22 = 22%)
     platform_commission_rate: float = 0.22
 
+    # Admin account
+    admin_email: str = "admin@thronoschain.org"
+    admin_password: str = "SkyStriker2026!"
+    admin_token: str = "skystriker-admin"
+
     cors_allow_origins: str = ""
 
     class Config:

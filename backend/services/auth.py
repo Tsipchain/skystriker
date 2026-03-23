@@ -157,7 +157,26 @@ def get_or_create_google_user(
         if google_sub and not user.google_sub:
             user.google_sub = google_sub
             user.auth_provider = AuthProvider.google
-            db.commit()
+        # Upgrade to guide if requested and not already
+        if role == "guide" and user.role != UserRole.guide:
+            user.role = UserRole.guide
+            logger.info("Upgraded user %s from %s to guide", user.id, user.role.value if hasattr(user.role, 'value') else user.role)
+        # Ensure Guide record exists for guide users
+        if user.role == UserRole.guide:
+            existing_guide = db.execute(
+                select(Guide).where(Guide.user_id == user.id)
+            ).scalar_one_or_none()
+            if not existing_guide:
+                guide = Guide(
+                    user_id=user.id,
+                    full_name=user.full_name,
+                    email=user.email,
+                    avatar_url=user.avatar_url or google_data.get("picture", ""),
+                )
+                db.add(guide)
+                logger.info("Auto-created guide record for existing user %s", user.id)
+        db.commit()
+        db.refresh(user)
         return user
 
     # Create new user

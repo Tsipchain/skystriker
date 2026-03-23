@@ -8,14 +8,19 @@ import uuid
 
 from sqlalchemy import func, select
 
+from core.config import settings
 from models.platform import (
     City,
     Country,
     Experience,
     ExperienceCategory,
     Guide,
+    User,
+    UserRole,
+    AuthProvider,
     VerificationStatus,
 )
+from services.auth import hash_password
 from services.database import SessionLocal
 
 logger = logging.getLogger(__name__)
@@ -229,3 +234,35 @@ def seed_if_empty() -> None:
             "Demo data seeded: %d countries, %d cities, %d guides, %d experiences",
             6, 8, 5, len(experiences),
         )
+
+    # Always ensure admin account exists (runs even if data already seeded)
+    _ensure_admin_account()
+
+
+def _ensure_admin_account() -> None:
+    """Create or update the admin account from env vars."""
+    if SessionLocal is None:
+        return
+    with SessionLocal() as db:
+        from sqlalchemy import select
+        existing = db.execute(
+            select(User).where(User.email == settings.admin_email)
+        ).scalar_one_or_none()
+        if existing:
+            # Ensure role is admin
+            if existing.role != UserRole.admin:
+                existing.role = UserRole.admin
+                db.commit()
+                logger.info("Upgraded %s to admin role", settings.admin_email)
+            return
+        admin = User(
+            id=_uuid(),
+            email=settings.admin_email,
+            full_name="SkyStriker Admin",
+            password_hash=hash_password(settings.admin_password),
+            auth_provider=AuthProvider.email,
+            role=UserRole.admin,
+        )
+        db.add(admin)
+        db.commit()
+        logger.info("Admin account created: %s", settings.admin_email)

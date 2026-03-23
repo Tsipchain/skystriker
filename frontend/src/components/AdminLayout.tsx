@@ -13,6 +13,7 @@ export default function AdminLayout() {
     { to: '/admin/verifications', label: t('verifications'), icon: '🔍' },
     { to: '/admin/experiences', label: t('experiences'), icon: '🗺️' },
     { to: '/admin/reviews', label: t('reviews'), icon: '⭐' },
+    { to: '/admin/bookings', label: t('bookings_payouts'), icon: '💰' },
     { to: '/admin/audit', label: t('audit_log'), icon: '📋' },
   ]
 

@@ -92,6 +92,7 @@ export interface Booking {
   total_price: number
   platform_fee: number
   guide_payout: number
+  payout_status: string
   currency: string
   status: string
   note: string

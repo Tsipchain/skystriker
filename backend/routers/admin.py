@@ -14,6 +14,8 @@ from dependencies.database import get_db
 from models.platform import (
     AuditAction,
     AuditLog,
+    Booking,
+    BookingStatus,
     Experience,
     Guide,
     Review,
@@ -21,6 +23,7 @@ from models.platform import (
 )
 from schemas.platform import (
     AuditLogOut,
+    BookingOut,
     ExperienceCard,
     GuideCard,
     GuideDetail,
@@ -145,6 +148,47 @@ def flag_review(review_id: str, db: Session = Depends(get_db)):
 # ---------------------------------------------------------------------------
 # Audit log
 # ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# Bookings & Payouts
+# ---------------------------------------------------------------------------
+
+@router.get("/bookings", response_model=list[BookingOut])
+def admin_list_bookings(
+    status: str | None = None,
+    payout_status: str | None = None,
+    db: Session = Depends(get_db),
+):
+    q = select(Booking).order_by(Booking.created_at.desc()).limit(200)
+    if status:
+        q = q.where(Booking.status == status)
+    if payout_status:
+        q = q.where(Booking.payout_status == payout_status)
+    result = db.execute(q)
+    return result.scalars().all()
+
+
+@router.post("/bookings/{booking_id}/release-payout")
+def release_payout(booking_id: str, db: Session = Depends(get_db)):
+    """Admin releases payout to guide after reviewing the completed booking."""
+    result = db.execute(select(Booking).where(Booking.id == booking_id))
+    booking = result.scalar_one_or_none()
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    if booking.status != BookingStatus.completed:
+        raise HTTPException(status_code=400, detail="Booking must be completed before payout release")
+    booking.payout_status = "released"
+    svc = PlatformService(db)
+    svc._audit(
+        AuditAction.admin_action,
+        actor="admin",
+        target_type="booking",
+        target_id=booking.id,
+        detail=f"Payout released: {booking.currency} {booking.guide_payout:.2f} to guide",
+    )
+    db.commit()
+    return {"payout_status": "released", "guide_payout": booking.guide_payout}
+
 
 @router.get("/audit", response_model=list[AuditLogOut])
 def audit_log(

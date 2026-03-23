@@ -6,6 +6,7 @@ from fastapi import Depends, Header, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from core.config import settings
 from dependencies.database import get_db
 from models.platform import Guide, User
 from services.auth import decode_token
@@ -85,8 +86,8 @@ def require_admin(
         if payload and payload.get("role") == "admin":
             return True
 
-    # Legacy token
-    if x_admin_token == "skystriker-admin":
+    # Legacy token (configurable via ADMIN_TOKEN env var)
+    if x_admin_token and x_admin_token == settings.admin_token:
         return True
 
     raise HTTPException(

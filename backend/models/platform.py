@@ -258,6 +258,7 @@ class Booking(Base):
     total_price = Column(Float, default=0.0)
     platform_fee = Column(Float, default=0.0)         # 22% commission
     guide_payout = Column(Float, default=0.0)          # 78% to guide
+    payout_status = Column(String(20), default="pending")  # pending, released, paid
     currency = Column(String(6), default="EUR")
     status = Column(Enum(BookingStatus), default=BookingStatus.requested)
     note = Column(Text, default="")
