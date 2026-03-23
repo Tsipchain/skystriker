@@ -45,6 +45,17 @@ router = APIRouter(prefix="/api/v1/public", tags=["public"])
 
 
 # ---------------------------------------------------------------------------
+# Client config (exposes safe-to-share settings to the frontend)
+# ---------------------------------------------------------------------------
+
+@router.get("/config")
+def client_config():
+    return {
+        "google_client_id": settings.google_client_id or "",
+    }
+
+
+# ---------------------------------------------------------------------------
 # Stats
 # ---------------------------------------------------------------------------
 

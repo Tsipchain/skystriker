@@ -55,8 +55,17 @@ export default function Auth() {
 
   async function handleGoogleClick() {
     setError('')
-    // Try loading Google Identity Services
-    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
+    // Fetch Google Client ID from backend (runtime) or fall back to build-time env
+    let clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
+    if (!clientId) {
+      try {
+        const res = await fetch('/api/v1/public/config')
+        if (res.ok) {
+          const cfg = await res.json()
+          clientId = cfg.google_client_id || ''
+        }
+      } catch { /* ignore */ }
+    }
     if (!clientId) {
       setError(t('google_not_configured'))
       return
