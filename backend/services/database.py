@@ -12,7 +12,7 @@ import os
 from collections.abc import Iterator
 from pathlib import Path
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
@@ -72,9 +72,56 @@ def initialize_database() -> None:
     # Import all models so their tables are registered with the metadata
     import models.platform  # noqa: F401
 
+    # Create new tables (doesn't touch existing ones)
     Base.metadata.create_all(bind=_engine)
 
+    # Migrate existing tables: add missing columns for SQLite
+    if db_url.startswith("sqlite"):
+        _migrate_sqlite(_engine)
+
     logger.info("Database initialised (%s)", "sqlite" if db_url.startswith("sqlite") else "postgresql")
+
+
+def _migrate_sqlite(engine) -> None:
+    """Add missing columns to existing SQLite tables.
+
+    SQLAlchemy's create_all only creates new tables — it won't ALTER existing
+    ones.  This function inspects each model table and adds any columns that
+    are missing in the live database.
+    """
+    insp = inspect(engine)
+    existing_tables = insp.get_table_names()
+
+    for table in Base.metadata.sorted_tables:
+        if table.name not in existing_tables:
+            continue  # create_all already handled new tables
+
+        existing_cols = {c["name"] for c in insp.get_columns(table.name)}
+        with engine.begin() as conn:
+            for col in table.columns:
+                if col.name not in existing_cols:
+                    # Build a safe ALTER TABLE ADD COLUMN
+                    col_type = col.type.compile(engine.dialect)
+                    nullable = "NULL" if col.nullable else "NOT NULL"
+                    default = ""
+                    if col.default is not None:
+                        dv = col.default.arg
+                        if callable(dv):
+                            default = "DEFAULT ''"
+                        elif isinstance(dv, str):
+                            default = f"DEFAULT '{dv}'"
+                        elif isinstance(dv, bool):
+                            default = f"DEFAULT {1 if dv else 0}"
+                        elif isinstance(dv, (int, float)):
+                            default = f"DEFAULT {dv}"
+                        else:
+                            default = "DEFAULT ''"
+                    # SQLite requires DEFAULT for NOT NULL columns on existing data
+                    if nullable == "NOT NULL" and not default:
+                        default = "DEFAULT ''"
+                    sql = f'ALTER TABLE "{table.name}" ADD COLUMN "{col.name}" {col_type} {nullable} {default}'
+                    logger.info("Migration: %s", sql.strip())
+                    conn.execute(text(sql))
 
 
 def close_database() -> None:

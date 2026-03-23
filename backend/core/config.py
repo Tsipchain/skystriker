@@ -3,7 +3,7 @@
 import logging
 import os
 
-from pydantic import field_validator
+from pydantic import AliasChoices, Field, field_validator
 from pydantic_settings import BaseSettings
 
 
@@ -15,6 +15,14 @@ class Settings(BaseSettings):
         if isinstance(v, str):
             return int(v.strip().strip('"').strip("'"))
         return v
+
+    @field_validator("jwt_secret", mode="before")
+    @classmethod
+    def _strip_quoted_str(cls, v):
+        if isinstance(v, str):
+            return v.strip().strip('"').strip("'")
+        return v
+
     app_name: str = "Thronos Chain SkyStriker Global Guides"
     debug: bool = False
     version: str = "2.0.0"
@@ -30,8 +38,11 @@ class Settings(BaseSettings):
     verifyid_base_url: str = "https://verifyid.thronos.example/api"
     verifyid_provider_label: str = "VerifyID"
 
-    # Auth / JWT
-    jwt_secret: str = "skystriker-dev-secret-change-in-production"
+    # Auth / JWT  (accepts JWT_SECRET or JWT_SECRET_KEY env var)
+    jwt_secret: str = Field(
+        default="skystriker-dev-secret-change-in-production",
+        validation_alias=AliasChoices("jwt_secret", "jwt_secret_key"),
+    )
     jwt_algorithm: str = "HS256"
     jwt_expire_minutes: int = 1440  # 24 hours
 
