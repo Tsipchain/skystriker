@@ -6,8 +6,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 DEFAULT_ORIGINS = [
-    "https://skystriker.app",
+    "https://guidestriker.thronoschain.org",
     "https://skystriker.thronoschain.org",
+    "https://skystriker.up.railway.app",
+    "https://skystriker.app",
     "http://localhost:5173",
     "http://localhost:3000",
 ]

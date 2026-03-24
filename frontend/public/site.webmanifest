@@ -1,16 +1,17 @@
 {
   "name": "SkyStriker Global Guides",
   "short_name": "SkyStriker",
-  "description": "Verified local guides & destination experiences",
+  "description": "Blockchain-verified local guides & authentic destination experiences worldwide. Powered by Thronos Chain.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f172a",
-  "theme_color": "#38bdf8",
+  "theme_color": "#0369a1",
   "icons": [
     {
       "src": "/favicon.svg",
       "sizes": "any",
-      "type": "image/svg+xml"
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ]
 }
