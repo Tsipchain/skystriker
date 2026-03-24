@@ -6,7 +6,7 @@ interface AuthContextType {
   user: AuthUser | null
   loading: boolean
   login: (email: string, password: string) => Promise<void>
-  signup: (email: string, password: string, fullName: string, role: string) => Promise<void>
+  signup: (email: string, password: string, fullName: string, role: string, termsAccepted?: boolean) => Promise<void>
   googleLogin: (idToken: string, role: string) => Promise<void>
   logout: () => void
 }
@@ -59,12 +59,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(res.user)
   }
 
-  async function signup(email: string, password: string, fullName: string, role: string) {
+  async function signup(email: string, password: string, fullName: string, role: string, termsAccepted = false) {
     const res = await api.post<AuthResponse>('/api/v1/auth/signup', {
       email,
       password,
       full_name: fullName,
       role,
+      terms_accepted: termsAccepted,
     })
     setSession(res.token, res.user)
     setUser(res.user)

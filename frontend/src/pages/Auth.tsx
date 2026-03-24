@@ -10,6 +10,7 @@ export default function Auth() {
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
   const [role, setRole] = useState<'guest' | 'guide'>('guest')
+  const [termsAccepted, setTermsAccepted] = useState(false)
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const { login, signup, googleLogin, user } = useAuth()
@@ -43,7 +44,12 @@ export default function Auth() {
           setSubmitting(false)
           return
         }
-        await signup(email, password, fullName, role)
+        if (!termsAccepted) {
+          setError(t('terms_must_accept'))
+          setSubmitting(false)
+          return
+        }
+        await signup(email, password, fullName, role, true)
         navigate(role === 'guide' ? '/guide' : '/')
       }
     } catch (err: unknown) {
@@ -246,6 +252,23 @@ export default function Auth() {
                 placeholder={mode === 'signup' ? t('at_least_6_chars') : t('password')}
               />
             </div>
+
+            {mode === 'signup' && (
+              <label className="flex items-start gap-2 text-sm text-gray-600 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={termsAccepted}
+                  onChange={(e) => setTermsAccepted(e.target.checked)}
+                  className="mt-0.5 rounded border-gray-300 text-sky-600 focus:ring-sky-500"
+                />
+                <span>
+                  {t('terms_agree_prefix')}{' '}
+                  <Link to="/terms" target="_blank" className="text-sky-600 hover:underline">{t('terms_of_service')}</Link>
+                  {' '}{t('terms_and')}{' '}
+                  <Link to="/privacy" target="_blank" className="text-sky-600 hover:underline">{t('privacy_policy')}</Link>
+                </span>
+              </label>
+            )}
 
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">

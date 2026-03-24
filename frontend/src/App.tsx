@@ -20,6 +20,8 @@ import GuideProfile from './pages/GuideProfile'
 import Experiences from './pages/Experiences'
 import ExperienceDetail from './pages/ExperienceDetail'
 import VerificationExplainer from './pages/VerificationExplainer'
+import TermsOfService from './pages/TermsOfService'
+import PrivacyPolicy from './pages/PrivacyPolicy'
 
 // Guide dashboard pages
 import GuideOverview from './pages/guide/GuideOverview'
@@ -60,6 +62,8 @@ function App() {
               <Route path="/experiences" element={<Experiences />} />
               <Route path="/experiences/:slug" element={<ExperienceDetail />} />
               <Route path="/verification" element={<VerificationExplainer />} />
+              <Route path="/terms" element={<TermsOfService />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
             </Route>
 
             {/* Guide dashboard */}

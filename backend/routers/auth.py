@@ -32,6 +32,7 @@ class SignupRequest(BaseModel):
     password: str
     full_name: str
     role: str = "guest"  # "guest" or "guide"
+    terms_accepted: bool = False
 
 
 class LoginRequest(BaseModel):
@@ -78,7 +79,13 @@ def signup(req: SignupRequest, db: Session = Depends(get_db)):
     if req.role not in ("guest", "guide"):
         raise HTTPException(status_code=400, detail="Invalid role")
 
-    user = register_email_user(db, req.email, req.password, req.full_name, req.role)
+    if not req.terms_accepted:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You must accept the Terms of Service and Privacy Policy",
+        )
+
+    user = register_email_user(db, req.email, req.password, req.full_name, req.role, terms_accepted=True)
     token = create_access_token(user.id, user.role.value)
 
     guide_id = None

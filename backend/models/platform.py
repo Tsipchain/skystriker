@@ -125,6 +125,7 @@ class User(Base):
     google_sub = Column(String(255), default="", index=True)  # Google subject ID
     role = Column(Enum(UserRole), default=UserRole.guest, nullable=False)
     is_active = Column(Boolean, default=True)
+    terms_accepted_at = Column(DateTime, nullable=True)      # GDPR / T&C consent timestamp
     created_at = Column(DateTime, default=_utcnow, nullable=False)
     updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow, nullable=False)
 

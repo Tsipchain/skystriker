@@ -124,6 +124,13 @@ export default function PublicLayout() {
                 <li><Link to="/guide" className="hover:text-white">{t('guide_dashboard')}</Link></li>
               </ul>
             </div>
+            <div>
+              <p className="text-white font-semibold mb-2">{t('legal')}</p>
+              <ul className="space-y-1">
+                <li><Link to="/terms" className="hover:text-white">{t('terms_of_service')}</Link></li>
+                <li><Link to="/privacy" className="hover:text-white">{t('privacy_policy')}</Link></li>
+              </ul>
+            </div>
           </div>
         </div>
       </footer>

@@ -84,6 +84,7 @@ def decode_token(token: str) -> Optional[dict]:
 
 def register_email_user(
     db: Session, email: str, password: str, full_name: str, role: str = "guest",
+    *, terms_accepted: bool = False,
 ) -> User:
     user = User(
         email=email.lower().strip(),
@@ -91,6 +92,7 @@ def register_email_user(
         password_hash=hash_password(password),
         auth_provider=AuthProvider.email,
         role=UserRole(role),
+        terms_accepted_at=datetime.utcnow() if terms_accepted else None,
     )
     db.add(user)
 
@@ -196,6 +198,7 @@ def get_or_create_google_user(
         auth_provider=AuthProvider.google,
         google_sub=google_sub,
         role=UserRole(role),
+        terms_accepted_at=datetime.utcnow(),
     )
     db.add(user)
 
