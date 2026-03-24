@@ -57,10 +57,10 @@ class Settings(BaseSettings):
     # Platform commission (0.22 = 22%)
     platform_commission_rate: float = 0.22
 
-    # Admin account
+    # Admin account (must be set via environment variables)
     admin_email: str = "admin@thronoschain.org"
-    admin_password: str = "Tsakalotos20216"
-    admin_token: str = "skystriker-admin"
+    admin_password: str = ""
+    admin_token: str = ""
 
     # Thronos blockchain nodes
     thronos_node1_url: str = "https://thrchain.up.railway.app"

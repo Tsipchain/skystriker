@@ -38,7 +38,8 @@ def seed_if_empty() -> None:
     with SessionLocal() as db:
         count = (db.execute(select(func.count(Country.id)))).scalar()
         if count and count > 0:
-            logger.info("Database already seeded (%d countries) – skipping", count)
+            logger.info("Database already seeded (%d countries) – skipping demo data", count)
+            _ensure_admin_account()
             return
 
         logger.info("Seeding demo data …")
@@ -243,9 +244,13 @@ def _ensure_admin_account() -> None:
     """Create or update the admin account from env vars."""
     if SessionLocal is None:
         return
+    if not settings.admin_password:
+        logger.warning("ADMIN_PASSWORD not set – skipping admin account setup")
+        return
     with SessionLocal() as db:
         from sqlalchemy import select
         admin_email = settings.admin_email.lower().strip()
+        logger.info("Ensuring admin account for %s …", admin_email)
         existing = db.execute(
             select(User).where(User.email == admin_email)
         ).scalar_one_or_none()
@@ -253,11 +258,11 @@ def _ensure_admin_account() -> None:
             # Ensure role is admin
             if existing.role != UserRole.admin:
                 existing.role = UserRole.admin
-                logger.info("Upgraded %s to admin role", settings.admin_email)
-            # Always sync password hash with current config value
+                logger.info("Upgraded %s to admin role", admin_email)
+            # Always sync password hash with current env value
             existing.password_hash = hash_password(settings.admin_password)
             db.commit()
-            logger.info("Admin account synced: %s", settings.admin_email)
+            logger.info("Admin account password synced: %s", admin_email)
             return
         admin = User(
             id=_uuid(),
@@ -269,4 +274,4 @@ def _ensure_admin_account() -> None:
         )
         db.add(admin)
         db.commit()
-        logger.info("Admin account created: %s", settings.admin_email)
+        logger.info("Admin account created: %s", admin_email)
