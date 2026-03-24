@@ -125,7 +125,7 @@ export default function GuideVerification() {
           <span
             className={`px-3 py-1 rounded-full text-sm font-medium capitalize ${badgeColor[status] ?? badgeColor.unverified}`}
           >
-            {t(status)}
+            {t(status as keyof typeof import('../../i18n/translations/en').default)}
           </span>
         </div>
 
