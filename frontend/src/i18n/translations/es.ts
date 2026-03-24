@@ -1,5 +1,6 @@
 const es = {
   // Common
+  all: 'Todos',
   home: 'Inicio',
   cities: 'Ciudades',
   guides: 'Guías',

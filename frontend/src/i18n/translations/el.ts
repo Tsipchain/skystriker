@@ -1,5 +1,6 @@
 const el = {
   // Common
+  all: 'Όλα',
   home: 'Αρχική',
   cities: 'Πόλεις',
   guides: 'Ξεναγοί',

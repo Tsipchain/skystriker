@@ -1,5 +1,6 @@
 const de = {
   // Common
+  all: 'Alle',
   home: 'Startseite',
   cities: 'Städte',
   guides: 'Reiseführer',

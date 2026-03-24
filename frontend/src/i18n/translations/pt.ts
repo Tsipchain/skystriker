@@ -1,5 +1,6 @@
 const pt = {
   // Common
+  all: 'Todos',
   home: 'Início',
   cities: 'Cidades',
   guides: 'Guias',

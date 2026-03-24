@@ -1,5 +1,6 @@
 const tr = {
   // Common
+  all: 'Tümü',
   home: 'Ana Sayfa',
   cities: 'Şehirler',
   guides: 'Rehberler',
