@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLang } from '../context/LanguageContext'
+import Logo from '../components/Logo'
 
 export default function Auth() {
   const { t } = useLang()
@@ -124,7 +125,7 @@ export default function Auth() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 text-2xl font-extrabold text-sky-700">
-            <span className="text-3xl">&#9992;</span> SkyStriker
+            <Logo size={36} /> SkyStriker
           </Link>
           <p className="text-gray-500 mt-2">
             {mode === 'login' ? t('welcome_back') : t('create_account')}

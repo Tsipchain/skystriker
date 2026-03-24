@@ -2,6 +2,7 @@ import { Link, Outlet, useLocation, Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLang } from '../context/LanguageContext'
 import LanguageSwitcher from './LanguageSwitcher'
+import Logo from './Logo'
 
 export default function AdminLayout() {
   const { t } = useLang()
@@ -27,8 +28,8 @@ export default function AdminLayout() {
     <div className="min-h-screen flex bg-gray-50">
       <aside className="w-64 bg-gray-900 text-gray-300 hidden lg:flex flex-col">
         <div className="h-16 flex items-center px-6 border-b border-gray-800">
-          <Link to="/" className="font-extrabold text-white text-lg tracking-tight">
-            &#9992; SkyStriker <span className="text-xs font-normal text-gray-500 ml-1">{t('admin_suffix')}</span>
+          <Link to="/" className="flex items-center gap-2 font-extrabold text-white text-lg tracking-tight">
+            <Logo size={24} /> SkyStriker <span className="text-xs font-normal text-gray-500 ml-1">{t('admin_suffix')}</span>
           </Link>
         </div>
         <nav className="flex-1 py-4 px-3 space-y-1">

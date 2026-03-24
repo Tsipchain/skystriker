@@ -2,6 +2,7 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLang } from '../context/LanguageContext'
 import LanguageSwitcher from './LanguageSwitcher'
+import Logo from './Logo'
 
 const NAV_KEYS = [
   { to: '/', key: 'home' as const },
@@ -23,7 +24,7 @@ export default function PublicLayout() {
       <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 font-extrabold text-xl text-sky-700 tracking-tight">
-            <span className="text-2xl">&#9992;</span> SkyStriker
+            <Logo size={28} /> SkyStriker
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">
@@ -104,7 +105,10 @@ export default function PublicLayout() {
       <footer className="bg-gray-900 text-gray-400 py-10 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between gap-8 text-sm">
           <div>
-            <p className="text-white font-bold text-lg mb-1">{t('skystriker_global')}</p>
+            <div className="flex items-center gap-2 mb-2">
+              <Logo size={24} />
+              <p className="text-white font-bold text-lg">{t('skystriker_global')}</p>
+            </div>
             <p>{t('footer_tagline')}</p>
             <p className="mt-1">{t('footer_ecosystem', { name: 'Thronos Chain' })}</p>
           </div>
