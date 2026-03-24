@@ -252,8 +252,11 @@ def _ensure_admin_account() -> None:
             # Ensure role is admin
             if existing.role != UserRole.admin:
                 existing.role = UserRole.admin
-                db.commit()
                 logger.info("Upgraded %s to admin role", settings.admin_email)
+            # Always sync password hash with current config value
+            existing.password_hash = hash_password(settings.admin_password)
+            db.commit()
+            logger.info("Admin account synced: %s", settings.admin_email)
             return
         admin = User(
             id=_uuid(),
