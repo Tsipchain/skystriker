@@ -34,8 +34,10 @@ class Settings(BaseSettings):
 
     database_url: str | None = None
 
-    # Verification provider
+    # Verification provider (VerifyID SaaS platform)
     verifyid_base_url: str = "https://verifyid.thronos.example/api"
+    verifyid_api_url: str = ""        # e.g. https://thronos-verifyid.vercel.app
+    verifyid_internal_key: str = ""   # shared key for cross-service auth
     verifyid_provider_label: str = "VerifyID"
 
     # Auth / JWT  (accepts JWT_SECRET or JWT_SECRET_KEY env var)

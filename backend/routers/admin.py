@@ -1,13 +1,16 @@
 """Admin endpoints for platform management.
 
-All routes require the ``X-Admin-Token`` header.
+All routes require the ``X-Admin-Token`` header or a JWT with admin role.
 """
 
 import logging
+import time
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel
 from sqlalchemy import select, func
 from sqlalchemy.orm import Session, joinedload
+from typing import Optional
 
 from dependencies.auth import require_admin
 from dependencies.database import get_db
@@ -68,28 +71,152 @@ def admin_guide_detail(guide_id: str, db: Session = Depends(get_db)):
 
 
 # ---------------------------------------------------------------------------
-# Verification
+# Verification (synced with VerifyID + Thronos blockchain)
 # ---------------------------------------------------------------------------
 
+class VerificationDecisionRequest(BaseModel):
+    notes: str = ""
+
+
 @router.post("/guides/{guide_id}/verify")
-def approve_verification(guide_id: str, db: Session = Depends(get_db)):
+async def approve_verification(
+    guide_id: str,
+    body: VerificationDecisionRequest = VerificationDecisionRequest(),
+    db: Session = Depends(get_db),
+):
+    from services.verifyid import verifyid_service
+    from services.blockchain import thronos_blockchain
+
     svc = PlatformService(db)
     guide = svc.set_verification_status(guide_id, VerificationStatus.verified, actor="admin")
-    return {"status": "verified", "guide_id": guide.id}
+
+    # Hash the decision and submit to Thronos blockchain
+    ts = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    verification_hash = verifyid_service.hash_verification(
+        guide_id=guide.id, guide_email=guide.email,
+        decision="verified", verifyid_ref=guide.verifyid_reference or "", timestamp=ts,
+    )
+    chain_result = thronos_blockchain._submit_to_node(
+        thronos_blockchain.node1_url,
+        {
+            "tx": f"0xVERIF{verification_hash[:16]}",
+            "network": "mainnet",
+            "verification_data": {
+                "type": "guide_verification",
+                "guide_id": guide.id,
+                "decision": "verified",
+                "hash": verification_hash,
+                "timestamp": ts,
+                "source": "skystriker",
+            },
+        },
+        verification_hash,
+    )
+
+    # Sync decision to VerifyID platform
+    verifyid_result = await verifyid_service.notify_decision(
+        guide_id=guide.id, guide_email=guide.email,
+        guide_name=guide.full_name, decision="verified",
+        verifyid_ref=guide.verifyid_reference or "", notes=body.notes,
+    )
+
+    svc._audit(
+        AuditAction.verification_approved, actor="admin",
+        target_type="guide", target_id=guide.id,
+        detail=f"Verified | blockchain_hash={verification_hash[:16]}… | verifyid_synced={verifyid_result.get('synced', False)}",
+    )
+    db.commit()
+
+    return {
+        "status": "verified",
+        "guide_id": guide.id,
+        "blockchain_hash": verification_hash,
+        "blockchain_submitted": chain_result.get("success", False),
+        "verifyid_synced": verifyid_result.get("synced", False),
+    }
 
 
 @router.post("/guides/{guide_id}/reject")
-def reject_verification(guide_id: str, db: Session = Depends(get_db)):
+async def reject_verification(
+    guide_id: str,
+    body: VerificationDecisionRequest = VerificationDecisionRequest(),
+    db: Session = Depends(get_db),
+):
+    from services.verifyid import verifyid_service
+
     svc = PlatformService(db)
     guide = svc.set_verification_status(guide_id, VerificationStatus.rejected, actor="admin")
-    return {"status": "rejected", "guide_id": guide.id}
+
+    # Sync rejection to VerifyID
+    verifyid_result = await verifyid_service.notify_decision(
+        guide_id=guide.id, guide_email=guide.email,
+        guide_name=guide.full_name, decision="rejected",
+        verifyid_ref=guide.verifyid_reference or "", notes=body.notes,
+    )
+
+    svc._audit(
+        AuditAction.verification_rejected, actor="admin",
+        target_type="guide", target_id=guide.id,
+        detail=f"Rejected | verifyid_synced={verifyid_result.get('synced', False)} | notes={body.notes}",
+    )
+    db.commit()
+
+    return {
+        "status": "rejected",
+        "guide_id": guide.id,
+        "verifyid_synced": verifyid_result.get("synced", False),
+    }
 
 
 @router.post("/guides/{guide_id}/suspend")
-def suspend_guide(guide_id: str, db: Session = Depends(get_db)):
+async def suspend_guide(
+    guide_id: str,
+    body: VerificationDecisionRequest = VerificationDecisionRequest(),
+    db: Session = Depends(get_db),
+):
+    from services.verifyid import verifyid_service
+
     svc = PlatformService(db)
     guide = svc.set_verification_status(guide_id, VerificationStatus.suspended, actor="admin")
-    return {"status": "suspended", "guide_id": guide.id}
+
+    verifyid_result = await verifyid_service.notify_decision(
+        guide_id=guide.id, guide_email=guide.email,
+        guide_name=guide.full_name, decision="suspended",
+        verifyid_ref=guide.verifyid_reference or "", notes=body.notes,
+    )
+    db.commit()
+
+    return {
+        "status": "suspended",
+        "guide_id": guide.id,
+        "verifyid_synced": verifyid_result.get("synced", False),
+    }
+
+
+# ---------------------------------------------------------------------------
+# VerifyID cross-platform endpoints
+# ---------------------------------------------------------------------------
+
+@router.get("/verifyid/status")
+async def verifyid_platform_status():
+    """Check VerifyID platform connectivity and agent availability."""
+    from services.verifyid import verifyid_service
+
+    agent_info = await verifyid_service.check_agent_available()
+    return {
+        "verifyid_configured": verifyid_service.available,
+        "agent_available": agent_info.get("agent_available", False),
+        "online_agents": agent_info.get("count", 0),
+    }
+
+
+@router.get("/verifyid/verifications")
+async def list_verifyid_verifications(status: Optional[str] = None):
+    """Fetch verification records from the VerifyID platform."""
+    from services.verifyid import verifyid_service
+
+    records = await verifyid_service.list_verifications(status=status)
+    return {"records": records, "count": len(records)}
 
 
 # ---------------------------------------------------------------------------
