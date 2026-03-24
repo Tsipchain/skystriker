@@ -93,7 +93,7 @@ def seed_if_empty() -> None:
             tagline="The Pearl of the Adriatic",
             description="Medieval walls, terracotta rooftops, and crystal-clear waters.",
             lat=42.6507, lng=18.0944,
-            photo_url="https://images.unsplash.com/photo-1555990538-1e7e8a399078?w=800",
+            photo_url="https://images.unsplash.com/photo-1580137189272-c9379f8864fd?w=800",
         )
         istanbul = City(
             id=_uuid(), country_id=tr.id, name="Istanbul", slug="istanbul",
@@ -245,8 +245,9 @@ def _ensure_admin_account() -> None:
         return
     with SessionLocal() as db:
         from sqlalchemy import select
+        admin_email = settings.admin_email.lower().strip()
         existing = db.execute(
-            select(User).where(User.email == settings.admin_email)
+            select(User).where(User.email == admin_email)
         ).scalar_one_or_none()
         if existing:
             # Ensure role is admin
@@ -260,7 +261,7 @@ def _ensure_admin_account() -> None:
             return
         admin = User(
             id=_uuid(),
-            email=settings.admin_email,
+            email=admin_email,
             full_name="SkyStriker Admin",
             password_hash=hash_password(settings.admin_password),
             auth_provider=AuthProvider.email,

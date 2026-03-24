@@ -164,21 +164,32 @@ export default function Home() {
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {guides.map((g) => (
-            <Link key={g.id} to={`/guides/${g.id}`} className="card p-6 text-center hover:shadow-md transition-shadow group">
-              <div className="w-20 h-20 rounded-full mx-auto mb-3 overflow-hidden bg-sky-100">
-                {g.avatar_url ? (
-                  <img src={g.avatar_url} alt={g.full_name} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-sky-400 text-2xl">&#9992;</div>
+            <Link key={g.id} to={`/guides/${g.id}`} className="card overflow-hidden hover:shadow-lg transition-all duration-300 group">
+              <div className="relative bg-gradient-to-br from-sky-500 to-sky-700 h-20">
+                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2">
+                  <div className="w-16 h-16 rounded-full border-4 border-white overflow-hidden bg-sky-100 shadow-md">
+                    {g.avatar_url ? (
+                      <img src={g.avatar_url} alt={g.full_name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-sky-400 text-xl">&#9992;</div>
+                    )}
+                  </div>
+                </div>
+                {g.verification_status === 'verified' && (
+                  <span className="absolute top-2 right-2 inline-flex items-center gap-1 bg-emerald-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                    {t('verified')}
+                  </span>
                 )}
               </div>
-              <h3 className="font-semibold text-gray-900 group-hover:text-sky-700">{g.full_name}</h3>
-              <p className="text-sm text-gray-500">{g.city_name}{g.country_name ? `, ${g.country_name}` : ''}</p>
-              <div className="mt-2 flex items-center justify-center gap-2">
-                <span className={g.verification_status === 'verified' ? 'badge-verified' : 'badge-pending'}>
-                  {t(g.verification_status as 'verified' | 'pending' | 'unverified')}
-                </span>
-                <span className="text-xs text-gray-400">{g.rating.toFixed(1)} ({g.total_reviews})</span>
+              <div className="pt-10 pb-4 px-4 text-center">
+                <h3 className="font-bold text-gray-900 group-hover:text-sky-700 transition-colors">{g.full_name}</h3>
+                <p className="text-sm text-gray-500">{g.city_name}{g.country_name ? `, ${g.country_name}` : ''}</p>
+                <div className="flex items-center justify-center gap-1 mt-2">
+                  <span className="text-amber-400 text-sm">&#9733;</span>
+                  <span className="text-sm font-semibold text-gray-700">{g.rating.toFixed(1)}</span>
+                  <span className="text-xs text-gray-400">({g.total_reviews})</span>
+                </div>
               </div>
             </Link>
           ))}
