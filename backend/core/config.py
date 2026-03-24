@@ -59,7 +59,7 @@ class Settings(BaseSettings):
 
     # Admin account
     admin_email: str = "admin@thronoschain.org"
-    admin_password: str = "SkyStriker2026!"
+    admin_password: str = "Tsakalotos20216"
     admin_token: str = "skystriker-admin"
 
     # Thronos blockchain nodes
