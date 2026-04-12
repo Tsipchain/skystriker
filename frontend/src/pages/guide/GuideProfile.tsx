@@ -62,7 +62,7 @@ export default function GuideProfile() {
         method: "POST",
         headers: {
           "X-Guide-Id": guide?.id || "",
-          Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+          Authorization: `Bearer ${localStorage.getItem("skystriker_token") || ""}`,
         },
         body: formData,
       });
