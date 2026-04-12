@@ -62,16 +62,18 @@ export default function Auth() {
 
   async function handleGoogleClick() {
     setError('')
-    // Fetch Google Client ID from backend (runtime) or fall back to build-time env
-    let clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
+    // Fetch Google Client ID from backend first so deployed runtime config wins.
+    // Fallback to build-time env only for local/dev setups.
+    let clientId = ''
+    try {
+      const res = await fetch('/api/v1/public/config')
+      if (res.ok) {
+        const cfg = await res.json()
+        clientId = cfg.google_client_id || ''
+      }
+    } catch { /* ignore */ }
     if (!clientId) {
-      try {
-        const res = await fetch('/api/v1/public/config')
-        if (res.ok) {
-          const cfg = await res.json()
-          clientId = cfg.google_client_id || ''
-        }
-      } catch { /* ignore */ }
+      clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
     }
     if (!clientId) {
       setError(t('google_not_configured'))
