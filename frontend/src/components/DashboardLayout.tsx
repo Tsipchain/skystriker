@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link, Outlet, useLocation, Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLang } from '../context/LanguageContext'
@@ -9,6 +10,7 @@ export default function DashboardLayout() {
   const { t } = useLang()
   const { pathname } = useLocation()
   const { user, logout } = useAuth()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const SIDEBAR = [
     { to: '/guide', label: t('overview'), icon: '📊' },
@@ -30,6 +32,53 @@ export default function DashboardLayout() {
 
   return (
     <div className="min-h-screen flex bg-gray-50">
+      {/* Mobile drawer backdrop */}
+      {mobileMenuOpen && (
+        <button
+          type="button"
+          aria-label="Close menu"
+          onClick={() => setMobileMenuOpen(false)}
+          className="lg:hidden fixed inset-0 bg-black/40 z-30"
+        />
+      )}
+
+      {/* Mobile drawer */}
+      <aside className={`lg:hidden fixed inset-y-0 left-0 w-72 bg-white border-r border-gray-200 z-40 flex flex-col transform transition-transform ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="h-16 flex items-center justify-between px-4 border-b border-gray-100">
+          <Link to="/" className="flex items-center gap-2 font-extrabold text-sky-700 text-lg tracking-tight" onClick={() => setMobileMenuOpen(false)}>
+            <Logo size={24} /> SkyStriker
+          </Link>
+          <button
+            type="button"
+            aria-label="Close menu"
+            onClick={() => setMobileMenuOpen(false)}
+            className="text-gray-500 hover:text-gray-700 text-xl"
+          >
+            ✕
+          </button>
+        </div>
+        <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
+          {SIDEBAR.map((s) => (
+            <Link
+              key={s.to}
+              to={s.to}
+              onClick={() => setMobileMenuOpen(false)}
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                pathname === s.to
+                  ? 'bg-sky-50 text-sky-700'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <span>{s.icon}</span>
+              <span className="flex-1">{s.label}</span>
+              {'premium' in s && s.premium && (
+                <span className="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-semibold">{t('pro_badge')}</span>
+              )}
+            </Link>
+          ))}
+        </nav>
+      </aside>
+
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-gray-200 hidden lg:flex flex-col">
         <div className="h-16 flex items-center px-6 border-b border-gray-100">
@@ -87,14 +136,24 @@ export default function DashboardLayout() {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 lg:px-8 sticky top-0 z-20">
-          <h1 className="text-lg font-semibold text-gray-900">{t('guide_dashboard')}</h1>
-          <div className="flex items-center gap-4">
+        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-8 sticky top-0 z-20">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              aria-label="Open menu"
+              onClick={() => setMobileMenuOpen(true)}
+              className="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-md border border-gray-300 text-gray-700"
+            >
+              ☰
+            </button>
+            <h1 className="text-lg font-semibold text-gray-900">{t('guide_dashboard')}</h1>
+          </div>
+          <div className="flex items-center gap-3 lg:gap-4">
             <LanguageSwitcher />
             <Link to="/" className="text-sm text-sky-600 hover:underline">{t('back_to_site')}</Link>
           </div>
         </header>
-        <main className="flex-1 p-6 lg:p-8 overflow-auto">
+        <main className="flex-1 p-4 lg:p-8 overflow-auto">
           <Outlet />
         </main>
       </div>
