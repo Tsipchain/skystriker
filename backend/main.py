@@ -15,7 +15,7 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from core.config import settings
+from core.config import settings, validate_environment
 from middleware.cors import setup_cors
 from services.database import close_database, initialize_database
 
@@ -33,6 +33,7 @@ async def lifespan(app: FastAPI):
         format="%(asctime)s  %(name)-30s  %(levelname)-8s  %(message)s",
     )
     logger.info("=== SkyStriker Global Guides – startup ===")
+    validate_environment()
     initialize_database()
 
     if settings.seed_demo_data:
