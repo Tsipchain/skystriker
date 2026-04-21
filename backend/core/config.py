@@ -40,9 +40,9 @@ class Settings(BaseSettings):
     verifyid_internal_key: str = ""   # shared key for cross-service auth
     verifyid_provider_label: str = "VerifyID"
 
+    # SECURITY: Default JWT secret removed — Phase 0 hardening
     # Auth / JWT  (accepts JWT_SECRET or JWT_SECRET_KEY env var)
     jwt_secret: str = Field(
-        default="skystriker-dev-secret-change-in-production",
         validation_alias=AliasChoices("jwt_secret", "jwt_secret_key"),
     )
     jwt_algorithm: str = "HS256"
@@ -83,6 +83,21 @@ settings = Settings()
 
 
 def validate_environment():
+    """Check critical env vars at startup — Phase 0 hardening."""
     logger = logging.getLogger(__name__)
     if not settings.database_url:
         logger.warning("DATABASE_URL not set – using in-memory SQLite")
+
+    # SECURITY: Warn about missing critical secrets — Phase 0 hardening
+    if not settings.admin_password:
+        logger.warning(
+            "ADMIN_PASSWORD not set — admin login will be unavailable"
+        )
+    if not settings.verifyid_internal_key:
+        logger.warning(
+            "VERIFYID_INTERNAL_KEY not set — cross-service auth disabled"
+        )
+    if not settings.google_client_id:
+        logger.warning(
+            "GOOGLE_CLIENT_ID not set — Google OAuth login will be unavailable"
+        )

@@ -1,31 +1,25 @@
-"""CORS middleware configuration."""
+"""CORS middleware configuration — Phase 0 hardened."""
 
 import os
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+# SECURITY: Restrict default origins to known production hosts — Phase 0 hardening
 DEFAULT_ORIGINS = [
-    "https://guidestriker.thronoschain.org",
+    "https://thronoschain.org",
     "https://skystriker.thronoschain.org",
-    "https://skystriker.up.railway.app",
-    "https://skystriker.app",
-    "http://localhost:5173",
-    "http://localhost:3000",
+    "https://api.thronoschain.org",
 ]
 
 
 def setup_cors(app: FastAPI):
-    origins = [
-        o.strip()
-        for o in os.getenv("CORS_ALLOW_ORIGINS", "").split(",")
-        if o.strip()
-    ] or DEFAULT_ORIGINS
+    env_origins = os.getenv("CORS_ORIGINS", "").split(",")
+    origins = [o.strip() for o in env_origins if o.strip()] or DEFAULT_ORIGINS
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
         allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-        expose_headers=["*"],
+        allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allow_headers=["Authorization", "Content-Type", "X-Admin-Token", "X-Guide-Id"],
     )
