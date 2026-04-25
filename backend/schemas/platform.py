@@ -119,6 +119,13 @@ class GuideProfileUpdate(BaseModel):
     stripe_account_id: Optional[str] = None
     crypto_wallet_address: Optional[str] = None
 
+    @field_validator("languages", "specialties", "service_city_ids", mode="before")
+    @classmethod
+    def _accept_list_or_str(cls, v):
+        if isinstance(v, list):
+            return ",".join(str(i).strip() for i in v if str(i).strip())
+        return v
+
 
 class VerificationSubmit(BaseModel):
     id_document_url: str
